@@ -27,7 +27,6 @@ payload:
   - DOMAIN-SUFFIX,mbcloud.com
 
   # > Industrial and Commercial Bank of China
-  # - USER-AGENT,%E4%B8%AD%E5%9B%BD%E5%B7%A5%E5%95%86%E9%93%B6%E8%A1%8C*
   - DOMAIN-SUFFIX,icbc.com.cn
 
   # > Ping An Bank
@@ -49,7 +48,6 @@ payload:
   - DOMAIN-SUFFIX,zmzfile.com
 
   # > Sony
-  # - USER-AGENT,RemotePlay*
   - DOMAIN-SUFFIX,sony.com
   - DOMAIN-SUFFIX,sonyentertainmentnetwork.com
 
@@ -73,7 +71,6 @@ payload:
   - DOMAIN-SUFFIX,jiedaibao.gs
   - DOMAIN,cdn.lilyemby.com
   - DOMAIN,tx.lilyemby.com
-
   - DOMAIN-SUFFIX,10010.com
   - DOMAIN-SUFFIX,10086.cn
   - DOMAIN-SUFFIX,12306.cn
@@ -320,7 +317,6 @@ payload:
   - DOMAIN-SUFFIX,zhimg.com
   - DOMAIN-SUFFIX,zimuzu.tv
   - DOMAIN-SUFFIX,zmz002.com
-
   - IP-CIDR,1.255.62.0/24,no-resolve
 
   # > CN
