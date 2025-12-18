@@ -1,7 +1,13 @@
 payload:
+  # > Self
+  - DOMAIN,tagss13.pro
+  - DOMAIN,rama991.siamparagon.org
+  - DOMAIN,link01.nobodys.uk
+  - DOMAIN,huaikhwang.central-world.org
+  - DOMAIN,villa.parkson-market.org
+
   # > Apple CDN
   - PROCESS-NAME,storedownloadd
-  # - USER-AGENT,com.apple.appstored*
   - DOMAIN,aod.itunes.apple.com
   - DOMAIN,appldnld.apple.com
   - DOMAIN,apptrailers.itunes.apple.com
@@ -22,7 +28,6 @@ payload:
   - DOMAIN-SUFFIX,dl.google.com
 
   # > Microsoft
-  # - USER-AGENT,Microsoft%20Remote%20Desktop*
   - DOMAIN-SUFFIX,msftconnecttest.com
 
   # > Passkey
@@ -37,32 +42,23 @@ payload:
   - DOMAIN-SUFFIX,dl.playstation.net
 
   # > Steam
-  # - USER-AGENT,Steam*
   - DOMAIN,cm.steampowered.com
   - DOMAIN,ol.epicgames.com
   - DOMAIN-SUFFIX,steamcontent.com
   - DOMAIN-SUFFIX,steamserver.net
-
   - DOMAIN-SUFFIX,steamchina.com
-
   - DOMAIN,csgo.wmsj.cn
   - DOMAIN,dota2.wmsj.cn
   - DOMAIN,wmsjsteam.com
-
   - DOMAIN,dl.steam.clngaa.com
   - DOMAIN,dl.steam.ksyna.com
-
   - DOMAIN,gstore.val.manlaxy.com
-
   - DOMAIN,st.dl.bscstorage.net
   - DOMAIN,st.dl.eccdnx.com
   - DOMAIN,st.dl.pinyuncloud.com
-
   - DOMAIN,steampipe.steamcontent.tnkjmec.com
-
   - DOMAIN,steampowered.com.8686c.com
   - DOMAIN,steamstatic.com.8686c.com
-
   - DOMAIN,steambroadcast.akamaized.net
   - DOMAIN,steamcdn-a.akamaihd.net
   - DOMAIN,steamcommunity-a.akamaihd.net
@@ -89,14 +85,12 @@ payload:
   - DOMAIN-SUFFIX,app-measurement.com
 
   # > Xunlei
-  # - USER-AGENT,%E8%BF%85%E9%9B%B7
   - DOMAIN-SUFFIX,xunlei.com
 
   # > Download
   - PROCESS-NAME,aria2c.exe
   - PROCESS-NAME,BitComet.exe
   - PROCESS-NAME,fdm.exe
-  # - PROCESS-NAME,IDMan.exe
   - PROCESS-NAME,NetTransport.exe
   - PROCESS-NAME,qbittorrent.exe
   - PROCESS-NAME,Thunder.exe
@@ -144,11 +138,9 @@ payload:
   - DOMAIN-SUFFIX,tjupt.org
   - DOMAIN-SUFFIX,totheglory.im
   - DOMAIN-SUFFIX,audiences.me
-
   - DOMAIN-KEYWORD,announce
   - DOMAIN-KEYWORD,torrent
   - DOMAIN-SUFFIX,smtp
-  # - URL-REGEX,(Subject|HELO|SMTP)
 
   # > UBI
   - DOMAIN,uplaypc-s-ubisoft.cdn.ubi.com
