@@ -1,0 +1,161 @@
+payload:
+  # > Augment
+  - DOMAIN-SUFFIX,augment.com
+  - DOMAIN-SUFFIX,augmentcode.com
+
+  # > ChatGPT
+  - DOMAIN-SUFFIX,ai.com
+  - DOMAIN-SUFFIX,chatgpt.com
+  - DOMAIN-SUFFIX,ct.sendgrid.net
+  - DOMAIN-SUFFIX,featureassets.org
+  - DOMAIN-SUFFIX,featuregates.org
+  - DOMAIN-SUFFIX,intercom.io
+  - DOMAIN-SUFFIX,intercomcdn.com
+  - DOMAIN-SUFFIX,oaistatic.com
+  - DOMAIN-SUFFIX,oaiusercontent.com
+  - DOMAIN-SUFFIX,openai.com
+  - DOMAIN-SUFFIX,prodregistryv2.org
+  - DOMAIN-SUFFIX,statsig.com
+  - DOMAIN-SUFFIX,statsigapi.net
+
+  # > Chat GPT API & CDN
+  - DOMAIN,cdn.openaimerge.com
+  - DOMAIN,cdn.workos.com
+  - DOMAIN,challenges.cloudflare.com
+  - DOMAIN,chat.openai.com.cdn.cloudflare.net
+  - DOMAIN,forwarder.workos.com
+  - DOMAIN,humb.apple.com
+  - DOMAIN,images.workoscdn.com
+  - DOMAIN,js.stripe.com
+  - DOMAIN,o207216.ingest.sentry.io
+  - DOMAIN,o33249.ingest.sentry.io
+  - DOMAIN,openaiapi-site.azureedge.net
+  - DOMAIN,openaicom-api-bdcpf8c6d2e9atf6.z01.azurefd.net
+  - DOMAIN,openaicomproductionae4b.blob.core.windows.net
+  - DOMAIN,production-openaicom-storage.azureedge.net
+  - DOMAIN,rum.browser-intake-datadoghq.com
+  - DOMAIN,setup.workos.com
+  - DOMAIN,workos.imgix.net
+
+  # > Cerebras
+  - DOMAIN-SUFFIX,cerebras.ai
+
+  # > Chorus
+  - DOMAIN-SUFFIX,chorus.sh
+
+  # > Claude
+  - DOMAIN-SUFFIX,anthropic.com
+  - DOMAIN-SUFFIX,claude.ai
+  - DOMAIN-SUFFIX,claude.com
+  - DOMAIN-SUFFIX,claudeusercontent.com
+
+  # > Cloudflare AI Gateway
+  - DOMAIN,gateway.ai.cloudflare.com
+
+  # > Copilot
+  - DOMAIN-SUFFIX,githubcopilot.com
+  - DOMAIN-SUFFIX,microsoftonline.com
+  - DOMAIN,copilot.microsoft.com
+
+  # > Cursor
+  - DOMAIN-SUFFIX,cursor.sh
+
+  # > DIA
+  - DOMAIN-SUFFIX,diabrowser.engineering
+
+  # > Dify.AI
+  - DOMAIN-SUFFIX,dify.ai
+
+  # > GitHub Copilot
+  - DOMAIN,api.github.com
+
+  # > Google AI Studio
+  - DOMAIN-KEYWORD,alkalimakersuite-pa.clients6.google.com
+  - DOMAIN-SUFFIX,aistudio.google.com
+  - DOMAIN-SUFFIX,makersuite.google.com
+  - DOMAIN-SUFFIX,generativeai.google
+  - DOMAIN,ai.google.dev
+  - DOMAIN,alkalicore-pa.clients6.google.com
+  - DOMAIN,waa-pa.clients6.google.com
+
+  # > Google DeepMind
+  - DOMAIN-SUFFIX,deepmind.com
+  - DOMAIN-SUFFIX,deepmind.google
+
+  # > Google Generative Language API
+  - DOMAIN-SUFFIX,generativelanguage.googleapis.com
+  - DOMAIN-SUFFIX,geller-pa.googleapis.com
+  - DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com
+
+  # > Google Gemini
+  - DOMAIN-SUFFIX,aisandbox-pa.googleapis.com
+  - DOMAIN-SUFFIX,apis.google.com
+  - DOMAIN-SUFFIX,bard.google.com
+  - DOMAIN-SUFFIX,gemini.google
+  - DOMAIN-SUFFIX,gemini.google.com
+  - DOMAIN-SUFFIX,robinfrontend-pa.googleapis.com
+
+  # > Google NotebookLM
+  - DOMAIN-SUFFIX,notebooklm.google
+  - DOMAIN-SUFFIX,notebooklm.google.com
+
+  # > Groq
+  - DOMAIN-SUFFIX,groq.com
+
+  # > Jasper
+  - DOMAIN-SUFFIX,clipdrop.co
+  - DOMAIN-SUFFIX,jasper.ai
+
+  # > JetBrains
+  - DOMAIN-SUFFIX,jetbrains.ai
+
+  # > Meta AI
+  - DOMAIN-SUFFIX,meta.ai
+  - DOMAIN-SUFFIX,meta.com
+
+  # > OpenArt
+  - DOMAIN-SUFFIX,openart.ai
+
+  # > OpenRouter
+  - DOMAIN-SUFFIX,openrouter.ai
+
+  # > Perplexity AI
+  - DOMAIN-SUFFIX,perplexity.ai
+
+  # > POE
+  - DOMAIN-SUFFIX,poe.com
+
+  # > Siri
+  - DOMAIN-SUFFIX,apple-relay.apple.com
+  - DOMAIN-SUFFIX,apple-relay.fastly-edge.com
+  - DOMAIN-SUFFIX,apple-relay.cloudflare.com
+  - DOMAIN-SUFFIX,guzzoni.apple.com
+  - DOMAIN-SUFFIX,cp4.cloudflare.com
+  - DOMAIN-SUFFIX,gspe1-ssl.ls.apple.com
+  - DOMAIN-SUFFIX,smoot.apple.com
+
+  # > Sora
+  - DOMAIN-SUFFIX,sora.com
+
+  # > TRAE
+  - DOMAIN-SUFFIX,trae.ai
+  - DOMAIN-SUFFIX,traeapi.us
+
+  # > Windsurf
+  - DOMAIN-SUFFIX,windsurf.com
+  - DOMAIN-SUFFIX,codeium.com
+  - DOMAIN-SUFFIX,codeiumdata.com
+
+  # > Zed
+  - DOMAIN-SUFFIX,zed.dev
+
+  # > xAI
+  - DOMAIN,api.mixpanel.com
+  - DOMAIN,egv4py1c-ios.mobile-messenger.intercom.com
+  - DOMAIN,nexus-websocket-a.intercom.io
+  - DOMAIN,o2129.ingest.sentry.io
+  - DOMAIN,o4508179396558848.ingest.us.sentry.io
+  - DOMAIN,xai.chronosphere.io
+  - DOMAIN-SUFFIX,grok.com
+  - DOMAIN-SUFFIX,grokipedia.com
+  - DOMAIN-SUFFIX,x.ai
