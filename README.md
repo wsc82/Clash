@@ -2,7 +2,7 @@
 
 这里是 Clash / mihomo 用的规则，从 [wsc82/Surge](https://github.com/wsc82/Surge) 自动转过来的。
 
-每天会拉一次 Surge 仓库里的三个 `.list`，转成 classical 的 yaml。想改规则就去 Surge 那边改，别在这个仓库里手改 `Ruleset/*.yaml`，下次同步会盖掉。
+每天凌晨 0:30（北京时间）会拉一次 Surge 仓库里的三个 `.list`，转成 classical 的 yaml。想改规则就去 Surge 那边改，别在这个仓库里手改 `Ruleset/*.yaml`，下次同步会盖掉。
 
 Surge 里 mihomo 不认识的规则（比如 `USER-AGENT`、`URL-REGEX`、`RULE-SET`）转换时会丢掉，不会写进 yaml。
 
