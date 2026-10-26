@@ -8,9 +8,23 @@ Surge 里 mihomo 不认识的规则（比如 `USER-AGENT`、`URL-REGEX`、`RULE-
 
 ## 订阅地址
 
-- Global：https://raw.githubusercontent.com/wsc82/Clash/main/Ruleset/Global.yaml
-- Domestic：https://raw.githubusercontent.com/wsc82/Clash/main/Ruleset/Domestic.yaml
-- JP：https://raw.githubusercontent.com/wsc82/Clash/main/Ruleset/JP.yaml
+Global：
+
+```
+https://raw.githubusercontent.com/wsc82/Clash/main/Ruleset/Global.yaml
+```
+
+Domestic：
+
+```
+https://raw.githubusercontent.com/wsc82/Clash/main/Ruleset/Domestic.yaml
+```
+
+JP：
+
+```
+https://raw.githubusercontent.com/wsc82/Clash/main/Ruleset/JP.yaml
+```
 
 ## mihomo / Clash Verge
 
