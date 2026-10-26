@@ -1,0 +1,52 @@
+# Fetch the three Surge rule lists and refresh the Clash copies on main.
+# GITHUB_TOKEN is enough: this workflow does not use extra secrets.
+name: Sync Surge rules
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-surge-rules
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Fetch Surge lists and convert
+        env:
+          GLOBAL_URL: https://raw.githubusercontent.com/wsc82/Surge/main/Ruleset/Global.list
+          DOMESTIC_URL: https://raw.githubusercontent.com/wsc82/Surge/main/Ruleset/Domestic.list
+          JP_URL: https://raw.githubusercontent.com/wsc82/Surge/main/Ruleset/JP.list
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/surge Ruleset
+          curl -fsSL --retry 5 --retry-delay 2 -o /tmp/surge/Global.list "$GLOBAL_URL"
+          curl -fsSL --retry 5 --retry-delay 2 -o /tmp/surge/Domestic.list "$DOMESTIC_URL"
+          curl -fsSL --retry 5 --retry-delay 2 -o /tmp/surge/JP.list "$JP_URL"
+          python3 scripts/surge_to_clash.py /tmp/surge/Global.list Ruleset/Global.yaml --source "$GLOBAL_URL"
+          python3 scripts/surge_to_clash.py /tmp/surge/Domestic.list Ruleset/Domestic.yaml --source "$DOMESTIC_URL"
+          python3 scripts/surge_to_clash.py /tmp/surge/JP.list Ruleset/JP.yaml --source "$JP_URL"
+
+      - name: Commit and push when the rules changed
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- Ruleset/Global.yaml Ruleset/Domestic.yaml Ruleset/JP.yaml
+          if git diff --cached --quiet; then
+            echo "No rule changes."
+            exit 0
+          fi
+          git commit -m "chore: sync Clash rules from wsc82/Surge"
+          git push origin HEAD:main
