@@ -4,7 +4,7 @@ name: Sync Surge rules
 
 on:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "30 16 * * *"
   workflow_dispatch:
 
 permissions:
