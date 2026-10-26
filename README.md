@@ -30,14 +30,18 @@ https://raw.githubusercontent.com/wsc82/Clash/main/Ruleset/JP.yaml
 
 策略组里要有 `TOP` 和 `JP`。Domestic 走直连。
 
+JP 必须写在 Global 上面，因为 Global 包含整个 `.jp` 后缀。
+
 ```yaml
 rule-providers:
+  JP: {type: http, behavior: classical, format: yaml, url: https://raw.githubusercontent.com/wsc82/Clash/main/Ruleset/JP.yaml, path: ./ruleset/JP.yaml, interval: 86400}
   Global: {type: http, behavior: classical, format: yaml, url: https://raw.githubusercontent.com/wsc82/Clash/main/Ruleset/Global.yaml, path: ./ruleset/Global.yaml, interval: 86400}
   Domestic: {type: http, behavior: classical, format: yaml, url: https://raw.githubusercontent.com/wsc82/Clash/main/Ruleset/Domestic.yaml, path: ./ruleset/Domestic.yaml, interval: 86400}
-  JP: {type: http, behavior: classical, format: yaml, url: https://raw.githubusercontent.com/wsc82/Clash/main/Ruleset/JP.yaml, path: ./ruleset/JP.yaml, interval: 86400}
 
 rules:
-  - RULE-SET,Global,TOP
   - RULE-SET,JP,JP
+  - RULE-SET,Global,TOP
   - RULE-SET,Domestic,DIRECT
+  - GEOIP,CN,DIRECT
+  - MATCH,TOP
 ```
