@@ -1,0 +1,37 @@
+{
+  "failure_threshold": 3,
+  "sources": {
+    "Stash/YouTube.stoverride": {
+      "license": {
+        "consecutive_failures": 0,
+        "failover": false,
+        "last_error": null,
+        "last_status": "ok",
+        "mirror": "Stash/scripts/Maasea/LICENSE"
+      },
+      "module": {
+        "consecutive_failures": 0,
+        "failover": false,
+        "last_error": null,
+        "last_status": "ok"
+      },
+      "scripts": {
+        "https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.request.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/Maasea/youtube.request.js"
+        },
+        "https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.response.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/Maasea/youtube.response.js"
+        }
+      }
+    }
+  },
+  "version": 1
+}

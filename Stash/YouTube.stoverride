@@ -1,0 +1,48 @@
+# 由上游配置自动转换为 Stash 覆写，本文件是改写后的结果，请勿手工修改。
+# 上游：https://raw.githubusercontent.com/Maasea/sgmodule/master/YouTube.Enhance.sgmodule
+# 原作者：Maasea（https://github.com/Maasea/sgmodule）。著作权归原作者所有。
+# 许可证：Apache-2.0（http://www.apache.org/licenses/LICENSE-2.0），全文见 Stash/scripts/Maasea/LICENSE。
+name: Youtube (Music) Enhance
+desc: 适用于 Youtube & Youtube Music
+author: Maasea
+homepage: https://github.com/Maasea/sgmodule
+
+http:
+  mitm:
+    - '*.googlevideo.com'
+    - youtubei.googleapis.com
+
+  script:
+    - match: ^https:\/\/youtubei\.googleapis\.com\/(youtubei\/v1\/(browse|next|player|search|reel\/reel_watch_sequence|guide|account\/get_setting|get_watch|log_event|config))(\?(.*))?$
+      name: youtube.response
+      type: response
+      require-body: true
+      binary-mode: true
+      argument: '{"captionLang":"off","blockUpload":true,"blockImmersive":true,"blockShorts":false,"debug":false}'
+    - match: ^https?:\/\/[\w-]+\.googlevideo\.com\/initplayback.+&ack.*
+      name: youtube.request.init
+      type: request
+      require-body: true
+      binary-mode: true
+      argument: '{"captionLang":"off"}'
+    - match: ^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/log_event
+      name: youtube.request.log_event
+      type: request
+      require-body: true
+      binary-mode: true
+
+script-providers:
+  youtube.response:
+    url: https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.response.js
+    interval: 86400
+  youtube.request.init:
+    url: https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.request.js
+    interval: 86400
+  youtube.request.log_event:
+    url: https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.request.js
+    interval: 86400
+
+# 拦掉 YouTube 的 QUIC（UDP），让它回落到 TCP，这样 MitM 才能生效
+rules:
+  - AND,((DOMAIN-SUFFIX,googlevideo.com),(PROTOCOL,QUIC)),REJECT
+  - AND,((DOMAIN-SUFFIX,youtubei.googleapis.com),(PROTOCOL,QUIC)),REJECT
