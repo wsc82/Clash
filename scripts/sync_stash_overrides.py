@@ -16,6 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from qx_to_stash import self_check as qx_self_check  # noqa: E402
 from stash_mirror import mirror_self_check, sync_sources  # noqa: E402
 from stash_sources import SOURCES  # noqa: E402
 from surge_module_to_stash import ConvertError, self_check  # noqa: E402
@@ -24,6 +25,7 @@ from surge_module_to_stash import ConvertError, self_check  # noqa: E402
 def main() -> int:
     try:
         self_check()
+        qx_self_check()
         check_log = io.StringIO()
         try:
             with contextlib.redirect_stdout(check_log):

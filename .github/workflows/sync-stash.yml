@@ -1,4 +1,4 @@
-# Fetch configured upstream modules and refresh the Stash overrides on main.
+# Fetch configured upstream Surge modules and Quantumult X rewrites, then refresh the Stash overrides on main.
 # GITHUB_TOKEN is enough: this workflow does not use extra secrets.
 # The source list lives in scripts/stash_sources.py.
 name: Sync Stash overrides

@@ -1,0 +1,58 @@
+name: 哔哩哔哩去广告(残缺版)
+desc: |
+  残缺版B站去广告
+  从圈叉重写自动转换为 Stash 覆写。源: https://ddgksf2013.top/rewrite/BiliBiliAdsLite.conf
+  如需引用请注明出处，谢谢合作！
+author: '@ddgksf2013'
+homepage: 'https://ddgksf2013.top/rewrite/BiliBiliAdsLite.conf'
+category: 去广告
+# source: https://ddgksf2013.top/rewrite/BiliBiliAdsLite.conf
+
+http:
+  mitm:
+    - app.bilibili.com
+
+  url-rewrite:
+    - '^https?:\/\/app\.bilibili\.com\/x\/v2\/splash\/show - reject-200'
+
+  script:
+    - match: '^https:\/\/app\.bilibili\.com\/x\/v2\/splash\/list'
+      name: bilibili.ads
+      type: response
+      require-body: true
+      timeout: 30
+    - match: '^https?:\/\/app\.bilibili\.com\/x\/v2\/account\/myinfo\?'
+      name: bilibili.ads
+      type: response
+      require-body: true
+      timeout: 30
+    - match: '^https?:\/\/app\.bilibili\.com\/x\/v2\/feed\/index'
+      name: bilibili.ads
+      type: response
+      require-body: true
+      timeout: 30
+    - match: '^https?:\/\/app\.bilibili\.com\/x\/resource\/show\/tab'
+      name: bilibili.ads
+      type: response
+      require-body: true
+      timeout: 30
+    - match: '^https?:\/\/app\.bilibili\.com\/x\/v2\/account\/mine'
+      name: bilibili.ads
+      type: response
+      require-body: true
+      timeout: 30
+    - match: '^https?:\/\/app\.bilibili\.com\/x\/resource\/top\/activity'
+      name: bilibili.ads
+      type: response
+      require-body: true
+      timeout: 30
+    - match: '^https?:\/\/app\.bilibili\.com\/x\/v2\/search\/square'
+      name: bilibili.ads
+      type: response
+      require-body: true
+      timeout: 30
+
+script-providers:
+  bilibili.ads:
+    url: https://ddgksf2013.top/scripts/bilibili.ads.js
+    interval: 86400

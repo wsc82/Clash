@@ -22,13 +22,20 @@ from pathlib import Path
 
 import yaml
 
+from qx_to_stash import convert_qx_text
 from stash_sources import FAILURE_THRESHOLD, RAW_PREFIX, raw_url, render_readme
 from surge_module_to_stash import ConvertError, convert_sgmodule
 
 
 STATE_PATH = Path("Stash/mirror-state.json")
 USER_AGENT = "wsc82-Clash-stash-sync"
-JS_MIN_BYTES = 64
+# ddgksf2013.top answers other clients with an HTML page and HTTP 200.
+QX_USER_AGENT = "Quantumult%20X/1.5.0"
+QX_HOSTS = {"ddgksf2013.top"}
+# Quantumult X one-liners such as `$done({body:'{}'})` are valid and shorter
+# than a generic page. Empty and HTML bodies are rejected separately, and a
+# script that shrinks below one fifth of a 1000-byte copy is still rejected.
+JS_MIN_BYTES = 16
 OTHER_MIN_BYTES = 32
 
 
@@ -40,10 +47,17 @@ class FetchResult:
     error: str | None
 
 
+def user_agent_for(url: str) -> str:
+    host = urllib.parse.urlparse(url).hostname or ""
+    if host in QX_HOSTS:
+        return QX_USER_AGENT
+    return USER_AGENT
+
+
 def fetch_bytes(url: str) -> FetchResult:
     if not url.startswith("https://"):
         return FetchResult(None, b"", "", f"refusing non-https URL: {url}")
-    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    request = urllib.request.Request(url, headers={"User-Agent": user_agent_for(url)})
     last: Exception | None = None
     for attempt in range(5):
         try:
@@ -127,6 +141,8 @@ def validate_download(
             return "syntax"
     if kind == "license" and spdx == "Apache-2.0" and b"Apache License" not in body:
         return "license-text"
+    if kind == "license" and spdx == "MIT" and (b"MIT License" not in body or b"Copyright" not in body):
+        return "license-text"
     if kind == "module":
         try:
             text = body.decode("utf-8")
@@ -134,6 +150,14 @@ def validate_download(
             return "not-module"
         if "#!name=" not in text and "[Script]" not in text and "[MITM]" not in text:
             return "not-module"
+    if kind == "qx":
+        try:
+            text = body.decode("utf-8")
+        except UnicodeDecodeError:
+            return "not-qx"
+        lowered = text.lower()
+        if "hostname" not in lowered and " url " not in text:
+            return "not-qx"
     return None
 
 
@@ -323,8 +347,9 @@ def refresh_file(
             "empty": "response is empty",
             "tiny": f"response is suspiciously small ({len(result.body)} bytes)",
             "syntax": "JavaScript syntax check failed",
-            "license-text": "license text does not contain the Apache license",
+            "license-text": "license text does not match the expected license",
             "not-module": "response is not a Surge module",
+            "not-qx": "response is not a Quantumult X rewrite",
         }.get(status, status)
         return status, detail
     write_bytes(dest, result.body)
@@ -336,6 +361,7 @@ def process_source(
     source: dict[str, object],
     bucket: dict,
     fetch,
+    claimed: dict[str, str] | None = None,
 ) -> bool:
     """Update one source. Return True when upstream failed but the tree is safe."""
     failed = False
@@ -343,6 +369,7 @@ def process_source(
     author = str(source["author"])
     output_path = root / output_rel
     label = output_rel
+    claimed = {} if claimed is None else claimed
 
     license_url = source.get("license_url")
     license_rel = str(source.get("license_file") or "")
@@ -390,13 +417,49 @@ def process_source(
         if status != "ok":
             failed = True
 
+    companions = source.get("companion_files") or []
+    if not isinstance(companions, list):
+        raise ConvertError(f"{label} companion_files must be a list")
+    if companions:
+        companion_bucket = bucket.setdefault("companions", {})
+    for item in companions:
+        if not isinstance(item, dict):
+            raise ConvertError(f"{label} companion file is not a mapping")
+        comp_url = item.get("url")
+        comp_rel = item.get("file")
+        if not isinstance(comp_url, str) or not isinstance(comp_rel, str):
+            raise ConvertError(f"{label} companion file needs url and file")
+        if not comp_rel.startswith("Stash/") or ".." in comp_rel.split("/"):
+            raise ConvertError(f"{label} companion path is outside Stash/: {comp_rel}")
+        comp_record = companion_bucket.setdefault(comp_rel, blank_record(comp_rel))
+        comp_record["mirror"] = comp_rel
+        comp_spdx = item.get("spdx")
+        status, error = refresh_file(
+            comp_url,
+            root / comp_rel,
+            kind=str(item.get("kind") or "license"),
+            spdx=comp_spdx if isinstance(comp_spdx, str) else None,
+            fetch=fetch,
+        )
+        note_result(
+            comp_record,
+            status,
+            error,
+            (root / comp_rel).is_file(),
+            f"{label} {Path(comp_rel).name}",
+            switchable=False,
+        )
+        if status != "ok":
+            failed = True
+
     fresh: str | None = None
     module_record = bucket.setdefault("module", blank_record())
-    if source.get("kind") != "surge-sgmodule":
+    kind = source.get("kind")
+    if kind not in {"surge-sgmodule", "qx-rewrite"}:
         note_result(
             module_record,
             "unmappable",
-            f"no converter for kind {source.get('kind')!r}",
+            f"no converter for kind {kind!r}",
             output_path.is_file(),
             f"{label} module",
             switchable=False,
@@ -414,10 +477,11 @@ def process_source(
         elif fetched.status >= 400:
             module_status, module_error = f"http-{fetched.status}", fetched.error or f"HTTP {fetched.status}"
         else:
+            download_kind = "module" if kind == "surge-sgmodule" else "qx"
             problem = validate_download(
                 body,
                 fetched.content_type,
-                kind="module",
+                kind=download_kind,
                 previous=None,
             )
             if problem:
@@ -425,20 +489,29 @@ def process_source(
                 module_error = problem
             else:
                 try:
-                    fresh = convert_sgmodule(
-                        body.decode("utf-8"),
-                        source_url=str(source["source_url"]),
-                        author=author,
-                        homepage=str(source["homepage"]),
-                        license_spdx=str(source["license_spdx"]),
-                        license_file=license_rel,
-                        extra_rules=string_list(source.get("extra_rules"), f"{label} extra_rules"),
-                        extra_rules_comment=(
-                            source["extra_rules_comment"]
-                            if isinstance(source.get("extra_rules_comment"), str)
-                            else None
-                        ),
-                    )
+                    decoded = body.decode("utf-8")
+                    if kind == "surge-sgmodule":
+                        fresh = convert_sgmodule(
+                            decoded,
+                            source_url=str(source["source_url"]),
+                            author=author,
+                            homepage=str(source["homepage"]),
+                            license_spdx=str(source["license_spdx"]),
+                            license_file=license_rel,
+                            extra_rules=string_list(source.get("extra_rules"), f"{label} extra_rules"),
+                            extra_rules_comment=(
+                                source["extra_rules_comment"]
+                                if isinstance(source.get("extra_rules_comment"), str)
+                                else None
+                            ),
+                        )
+                    else:
+                        override_name = source.get("name")
+                        fresh = convert_qx_text(
+                            decoded,
+                            str(source["source_url"]),
+                            name=override_name if isinstance(override_name, str) else None,
+                        )
                 except ConvertError as exc:
                     module_status, module_error = "unmappable", str(exc)
                 except UnicodeDecodeError as exc:
@@ -491,6 +564,12 @@ def process_source(
             continue
         seen_names[filename] = url
         rel = mirror_relpath(author, filename)
+        owner = claimed.get(rel)
+        if owner not in {None, url}:
+            log(f"UPSTREAM FAILURE {label}: {rel} is already mirrored from {owner}", error=True)
+            failed = True
+            continue
+        claimed[rel] = url
         record = scripts.setdefault(url, blank_record(rel))
         record["mirror"] = rel
         status, error = refresh_file(
@@ -539,6 +618,7 @@ def sync_sources(root: Path, sources: list[dict[str, object]], fetch=fetch_bytes
     buckets: dict = state["sources"]
     failed = False
     seen: set[str] = set()
+    claimed: dict[str, str] = {}
     for source in sources:
         output = str(source["output"])
         if output in seen:
@@ -550,7 +630,7 @@ def sync_sources(root: Path, sources: list[dict[str, object]], fetch=fetch_bytes
             raise ConvertError(f"output path must not contain HideShorts: {output}")
         bucket = buckets.setdefault(output, {})
         try:
-            if process_source(root, source, bucket, fetch):
+            if process_source(root, source, bucket, fetch, claimed):
                 failed = True
         except ConvertError as exc:
             log(f"UPSTREAM FAILURE {output}: {exc}", error=True)
@@ -675,3 +755,80 @@ def mirror_self_check() -> None:
         assert kept_name in after
         assert "name: Example" in before
         assert mirror.read_bytes() == big_js
+
+    qx_url = "https://ddgksf2013.top/rewrite/Demo.conf"
+    bad_url = "https://ddgksf2013.top/rewrite/Bad.conf"
+    qx_js_url = "https://ddgksf2013.top/scripts/demo.js"
+    qx_js = _sample_js("qx", 90)
+    good_conf = "\n".join(
+        [
+            "// ==UserScript==",
+            "// @ScriptName        Demo Ads",
+            "// @Author            @ddgksf2013",
+            "// @ScriptURL         https://ddgksf2013.top/rewrite/Demo.conf",
+            "// @Desc              demo",
+            "// @Attention         如需引用请注明出处，谢谢合作！",
+            "// ==/UserScript==",
+            "hostname = example.com",
+            r"^https://example\.com/ad url reject",
+            r"^https://example\.com/api url script-response-body https://ddgksf2013.top/scripts/demo.js",
+            "",
+        ]
+    )
+    bad_conf = good_conf + r"^https://example\.com/x url echo-response text/plain echo-response https://example.com/x" + "\n"
+    good_source = {
+        "output": "Stash/DemoAds.stoverride",
+        "kind": "qx-rewrite",
+        "source_url": qx_url,
+        "name": "Demo Ads",
+        "author": "ddgksf2013",
+        "homepage": "https://github.com/ddgksf2013/Rewrite",
+        "attribution": "配置原文要求「如需引用请注明出处」。",
+    }
+    bad_source = {
+        "output": "Stash/BadAds.stoverride",
+        "kind": "qx-rewrite",
+        "source_url": bad_url,
+        "name": "Bad Ads",
+        "author": "ddgksf2013",
+        "homepage": "https://github.com/ddgksf2013/Rewrite",
+    }
+    qx_files = {
+        qx_url: FetchResult(200, good_conf.encode(), "text/plain", None),
+        bad_url: FetchResult(200, bad_conf.encode(), "text/plain", None),
+        qx_js_url: FetchResult(200, qx_js, "text/plain", None),
+    }
+
+    def qx_fake(url: str) -> FetchResult:
+        if url not in qx_files:
+            return FetchResult(404, b"missing", "text/plain", "HTTP 404")
+        return qx_files[url]
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        previous = "name: Bad Ads\n# previous good copy\n"
+        bad_path = root / "Stash/BadAds.stoverride"
+        bad_path.parent.mkdir(parents=True)
+        bad_path.write_text(previous, encoding="utf-8")
+        assert sync_sources(root, [good_source, bad_source], qx_fake) == 2
+        good_text = (root / "Stash/DemoAds.stoverride").read_text(encoding="utf-8")
+        assert "name: 'Demo Ads'" in good_text
+        assert "author: '@ddgksf2013'" in good_text
+        assert "# source: https://ddgksf2013.top/rewrite/Demo.conf" in good_text
+        assert qx_js_url in good_text
+        assert bad_path.read_text(encoding="utf-8") == previous
+        mirrored = root / "Stash/scripts/ddgksf2013/demo.js"
+        assert mirrored.read_bytes() == qx_js
+        subprocess.run(["node", "--check", str(mirrored)], check=True)
+        readme = (root / "Stash/README.md").read_text(encoding="utf-8")
+        assert "DemoAds.stoverride" in readme and "BadAds.stoverride" in readme
+        assert "https://github.com/ddgksf2013/Rewrite" in readme
+        qx_files[qx_url] = FetchResult(200, b"<!DOCTYPE html><html></html>", "text/html", None)
+        assert sync_sources(root, [good_source, bad_source], qx_fake) == 2
+        assert (root / "Stash/DemoAds.stoverride").read_text(encoding="utf-8") == good_text
+        assert bad_path.read_text(encoding="utf-8") == previous
+        assert mirrored.read_bytes() == qx_js
+
+    one_liner = b"$done({body:'{}'})\n"
+    assert validate_download(one_liner, "text/plain", kind="js", previous=None) is None
+    assert validate_download(b"error\n", "text/plain", kind="js", previous=None) == "tiny"

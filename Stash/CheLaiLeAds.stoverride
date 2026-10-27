@@ -1,0 +1,38 @@
+name: 车来了去广告
+desc: |
+  如果有需要的去除广告的APP，可自行在共享表格中添加需求
+  从圈叉重写自动转换为 Stash 覆写。源: https://raw.githubusercontent.com/ddgksf2013/Rewrite/refs/heads/master/AdBlock/CheLaiLeAds.conf
+  如需引用请注明出处，谢谢合作！
+author: '@ddgksf2013'
+homepage: 'https://raw.githubusercontent.com/ddgksf2013/Rewrite/refs/heads/master/AdBlock/CheLaiLeAds.cof'
+category: 去广告
+# source: https://raw.githubusercontent.com/ddgksf2013/Rewrite/refs/heads/master/AdBlock/CheLaiLeAds.conf
+
+http:
+  mitm:
+    - web.chelaile.net.cn
+    - api.chelaile.net.cn
+    - cdn.api.chelaile.net.cn
+    - cdn.web.chelaile.net.cn
+    - atrace.chelaile.net.cn
+
+  url-rewrite:
+    - '^https?:\/\/.*chelaile\.net\.cn\/goocity\/flowPos\/listByPos - reject'
+    - '^https?:\/\/cdn\.web\.chelaile\.net\.cn\/info-flow\/index\.html - reject-200'
+    - '^https?:\/\/.*chelaile\.net\.cn\/(api\/)?adpub - reject-200'
+    - '^https?:\/\/124\.70\.194\.16\/(ip|adpub) - reject-200'
+    - '^https?:\/\/124\.70\.194\.16\/goocity\/flowPos\/listByPos - reject-200'
+    - '^https?:\/\/web\.chelaile\.net\.cn\/api\/operative_position\/infoflow - reject-200'
+    - '^https?:\/\/atrace\.chelaile\.net\.cn\/(wx_preloadAd|adAnalysis) - reject-200'
+
+  script:
+    - match: '^https?:\/\/.*chelaile\.net\.cn\/goocity\/city!'
+      name: chelaile
+      type: response
+      require-body: true
+      timeout: 30
+
+script-providers:
+  chelaile:
+    url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/chelaile.js
+    interval: 86400
