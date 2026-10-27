@@ -1,17 +1,6 @@
 # 来源：https://raw.githubusercontent.com/wsc82/Surge/main/Ruleset/Global.list
 # 由 Surge 规则自动转换生成，请勿手工修改。
 payload:
-  # > 境外顶级域
-  - DOMAIN-SUFFIX,ca
-  - DOMAIN-SUFFIX,eu
-  - DOMAIN-SUFFIX,hk
-  - DOMAIN-SUFFIX,jp
-  - DOMAIN-SUFFIX,kr
-  - DOMAIN-SUFFIX,sg
-  - DOMAIN-SUFFIX,tw
-  - DOMAIN-SUFFIX,uk
-  - DOMAIN-SUFFIX,us
-
   # > 自用 & 其他
   - DOMAIN,docs.dmit.io
   - DOMAIN,tagss.pro
@@ -119,7 +108,6 @@ payload:
   - DOMAIN-SUFFIX,simplenote.com
   - DOMAIN-SUFFIX,sing-box.sagernet.org
   - DOMAIN-SUFFIX,sports-interactive.com
-  - DOMAIN-SUFFIX,sslip.io
   - DOMAIN-SUFFIX,stash.ws
   - DOMAIN-SUFFIX,stheadline.com
   - DOMAIN-SUFFIX,storm.mg
