@@ -1,0 +1,306 @@
+{
+  "failure_threshold": 3,
+  "sources": {
+    "Stash/AmapAds.stoverride": {
+      "module": {
+        "consecutive_failures": 0,
+        "failover": false,
+        "last_error": null,
+        "last_status": "ok"
+      },
+      "scripts": {
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/amap.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/amap.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/amdc.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/amdc.js"
+        }
+      }
+    },
+    "Stash/BiliBiliAdsLite.stoverride": {
+      "module": {
+        "consecutive_failures": 0,
+        "failover": false,
+        "last_error": null,
+        "last_status": "ok"
+      },
+      "scripts": {
+        "https://ddgksf2013.top/scripts/bilibili.ads.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/bilibili.ads.js"
+        }
+      }
+    },
+    "Stash/CheLaiLeAds.stoverride": {
+      "module": {
+        "consecutive_failures": 0,
+        "failover": false,
+        "last_error": null,
+        "last_status": "ok"
+      },
+      "scripts": {
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/chelaile.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/chelaile.js"
+        }
+      }
+    },
+    "Stash/MiGuVideoAds.stoverride": {
+      "module": {
+        "consecutive_failures": 0,
+        "failover": false,
+        "last_error": null,
+        "last_status": "ok"
+      },
+      "scripts": {
+        "https://ddgksf2013.top/scripts/migu.ads.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/migu.ads.js"
+        }
+      }
+    },
+    "Stash/StartUpAds.stoverride": {
+      "companions": {
+        "Stash/scripts/app2smile/LICENSE.md": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/app2smile/LICENSE.md"
+        }
+      },
+      "module": {
+        "consecutive_failures": 0,
+        "failover": false,
+        "last_error": null,
+        "last_status": "ok"
+      },
+      "scripts": {
+        "https://raw.githubusercontent.com/app2smile/rules/master/js/baidumap.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/baidumap.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/master/abchina.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/abchina.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/master/baishitv.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/baishitv.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/master/pinganads.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/pinganads.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/master/pupumarket.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/pupumarket.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/master/quark.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/quark.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/12306.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/12306.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/123pan.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/123pan.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/555Ad.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/555Ad.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/ahfs.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/ahfs.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/amdc.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/amdc.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/caixinads.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/caixinads.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/coolapk.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/coolapk.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/dict.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/dict.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/fly.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/fly.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/hanglvzongheng.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/hanglvzongheng.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/iqiyi_open_ads.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/iqiyi_open_ads.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/ithome.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/ithome.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/jd_json.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/jd_json.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/qidian.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/qidian.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/shunfeng_json.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/shunfeng_json.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/smzdm_json.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/smzdm_json.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/startup.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/startup.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/stay.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/stay.js"
+        },
+        "https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/zhihu_openads.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/ddgksf2013/zhihu_openads.js"
+        }
+      }
+    },
+    "Stash/YouTube.stoverride": {
+      "license": {
+        "consecutive_failures": 0,
+        "failover": false,
+        "last_error": null,
+        "last_status": "ok",
+        "mirror": "Stash/scripts/Maasea/LICENSE"
+      },
+      "module": {
+        "consecutive_failures": 0,
+        "failover": false,
+        "last_error": null,
+        "last_status": "ok"
+      },
+      "scripts": {
+        "https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.request.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/Maasea/youtube.request.js"
+        },
+        "https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.response.js": {
+          "consecutive_failures": 0,
+          "failover": false,
+          "last_error": null,
+          "last_status": "ok",
+          "mirror": "Stash/scripts/Maasea/youtube.response.js"
+        }
+      }
+    }
+  },
+  "version": 1
+}

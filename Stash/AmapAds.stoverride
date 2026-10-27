@@ -1,0 +1,90 @@
+name: 高德地图去广告
+desc: |
+  如果有需要的去除广告的APP，可自行在共享表格中添加需求
+  从圈叉重写自动转换为 Stash 覆写。源: https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/AmapAds.conf
+  如需引用请注明出处，谢谢合作！
+author: '@ddgksf2013'
+homepage: 'https://raw.githubusercontent.com/ddgksf2013/Rewrite/refs/heads/master/AdBlock/AmapAds.conf'
+category: 去广告
+# source: https://raw.githubusercontent.com/ddgksf2013/Rewrite/master/AdBlock/AmapAds.conf
+
+http:
+  mitm:
+    - m5.amap.com
+    - m5-zb.amap.com
+    - center.amap.com
+    - amap-aos-info-nogw.amap.com
+    - ai.amap.com
+
+  url-rewrite:
+    - '^https?:\/\/.*\.amap\.com\/ws\/aos\/alimama\/splash_screen - reject-200'
+    - '^https?:\/\/.*\.amap\.com\/v\d\/ai_rec\/ - reject-dict'
+    - '^https?:\/\/.*\.amap\.com\/ws\/faas\/amap-navigation\/card-service-route-plan\? - reject-dict'
+    - '^https?:\/\/.*\.amap\.com\/ws\/boss\/order_web\/\w{8}_information - reject-200'
+    - '^https?:\/\/.*\.amap\.com\/ws\/asa\/ads_attribution - reject'
+    - '^https?:\/\/.*\.amap\.com\/ws\/shield\/scene\/recommend - reject-dict'
+    - '^https?:\/\/.*\.amap\.com\/uploadimg\/\w+\.gif - reject-img'
+    - '^https?:\/\/.*\.amap\.com\/ws\/valueadded\/weather - reject-dict'
+
+  script:
+    - match: '^http:\/\/amdc\.m\.taobao\.com'
+      name: amdc
+      type: response
+      require-body: true
+      timeout: 30
+    - match: '^https?:\/\/.*\.amap\.com\/ws\/message\/notice\/list'
+      name: amap
+      type: response
+      require-body: true
+      timeout: 30
+    - match: '^https?:\/\/.*\.amap\.com\/ws\/shield\/frogserver\/aocs\/updatable'
+      name: amap
+      type: response
+      require-body: true
+      timeout: 30
+    - match: '^https?:\/\/.*\.amap\.com\/ws\/shield\/search\/nearbyrec_smart'
+      name: amap
+      type: response
+      require-body: true
+      timeout: 30
+    - match: '^https?:\/\/.*\.amap\.com\/ws\/promotion-web\/resource'
+      name: amap
+      type: response
+      require-body: true
+      timeout: 30
+    - match: '^https?:\/\/.*\.amap\.com\/ws\/faas\/amap-navigation\/main-page'
+      name: amap
+      type: response
+      require-body: true
+      timeout: 30
+    - match: '^https?:\/\/.*\.amap\.com\/ws\/valueadded\/alimama\/splash_screen'
+      name: amap
+      type: response
+      require-body: true
+      timeout: 30
+    - match: '^https?:\/\/.*\.amap\.com\/ws\/msgbox\/pull'
+      name: amap
+      type: response
+      require-body: true
+      timeout: 30
+    - match: '^https?:\/\/.*\.amap\.com\/ws\/shield\/dsp\/profile\/index\/nodefaas'
+      name: amap
+      type: response
+      require-body: true
+      timeout: 30
+    - match: '^https?:\/\/.*\.amap\.com\/ws\/shield\/search\/new_hotword'
+      name: amap
+      type: response
+      require-body: true
+      timeout: 30
+
+script-providers:
+  amdc:
+    url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/amdc.js
+    interval: 86400
+  amap:
+    url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/amap.js
+    interval: 86400
+
+rules:
+  - DOMAIN-SUFFIX,optimus-ads.amap.com,DIRECT
