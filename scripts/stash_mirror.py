@@ -24,7 +24,7 @@ import yaml
 
 from qx_to_stash import convert_qx_text
 from stash_sources import FAILURE_THRESHOLD, RAW_PREFIX, raw_url, render_readme
-from surge_module_to_stash import ConvertError, convert_sgmodule
+from surge_module_to_stash import ConvertError, convert_sgmodule, non_string_override_fields
 
 
 STATE_PATH = Path("Stash/mirror-state.json")
@@ -291,6 +291,17 @@ def provider_urls(text: str) -> list[str]:
             raise ConvertError(f"script provider {name} has no url")
         urls.append(item["url"])
     return urls
+
+
+def override_write_error(text: str) -> str | None:
+    """Return why this override must not replace the last good file."""
+    try:
+        loaded = yaml.safe_load(text)
+    except yaml.YAMLError as exc:
+        return f"not YAML: {exc}"
+    if not isinstance(loaded, dict) or "arguments" in loaded:
+        return "not usable"
+    return non_string_override_fields(loaded)
 
 
 def rewrite_script_urls(text: str, scripts: dict) -> str:
@@ -599,13 +610,9 @@ def process_source(
         log(f"KEEP {label}: no override exists yet, so nothing was written", error=True)
         return True
     rewritten = rewrite_script_urls(base, scripts)
-    try:
-        loaded = yaml.safe_load(rewritten)
-    except yaml.YAMLError as exc:
-        log(f"UPSTREAM FAILURE {label}: rewritten override is not YAML: {exc}", error=True)
-        return True
-    if not isinstance(loaded, dict) or "arguments" in loaded:
-        log(f"UPSTREAM FAILURE {label}: rewritten override is not usable", error=True)
+    problem = override_write_error(rewritten)
+    if problem:
+        log(f"UPSTREAM FAILURE {label}: {problem}; kept the previous override", error=True)
         return True
     if write_text(output_path, rewritten):
         log(f"wrote {output_rel}")
@@ -832,3 +839,32 @@ def mirror_self_check() -> None:
     one_liner = b"$done({body:'{}'})\n"
     assert validate_download(one_liner, "text/plain", kind="js", previous=None) is None
     assert validate_download(b"error\n", "text/plain", kind="js", previous=None) == "tiny"
+
+    bare_number = "\n".join(
+        [
+            "name: x",
+            "http:",
+            "  mitm:",
+            "    - example.com",
+            "  script:",
+            "    - match: '^https://example.com'",
+            "      name: 12306",
+            "      type: response",
+            "script-providers:",
+            "  12306:",
+            "    url: https://example.com/12306.js",
+            "    interval: 1",
+            "",
+        ]
+    )
+    assert override_write_error(bare_number)
+    quoted_number = bare_number.replace("name: 12306", "name: '12306'").replace("\n  12306:", "\n  '12306':")
+    assert override_write_error(quoted_number) is None
+    with tempfile.TemporaryDirectory() as tmp:
+        kept = Path(tmp) / "Num.stoverride"
+        kept.write_text("name: kept\n", encoding="utf-8")
+        if override_write_error(bare_number):
+            pass
+        else:
+            kept.write_text(bare_number, encoding="utf-8")
+        assert kept.read_text(encoding="utf-8") == "name: kept\n"

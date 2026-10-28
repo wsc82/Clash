@@ -10,11 +10,11 @@ category: 去广告
 
 http:
   mitm:
-    - 101.226.30.36
-    - 124.70.90.16
-    - 123.249.33.119
-    - 117.184.40.141
-    - 140.207.67.231
+    - '101.226.30.36'
+    - '124.70.90.16'
+    - '123.249.33.119'
+    - '117.184.40.141'
+    - '140.207.67.231'
     - ossx-link.ztehome.com.cn
     - yuudnn.lz-qs.com
     - marki.markiapp.com
@@ -31,7 +31,7 @@ http:
     - api.qeeniao.com
     - apicloud.zol.com.cn
     - p0.pipi.cn
-    - 203.107.1.97
+    - '203.107.1.97'
     - choicegw2.eastmoney.com
     - m.mynj.cn
     - vod.pipi.cn
@@ -84,7 +84,7 @@ http:
     - app.duxiaoman.com
     - '*.flyert.*'
     - lop-proxy.jd.com
-    - 101.227.139.118
+    - '101.227.139.118'
     - i.zhaojinapp.com
     - patientgate.91160.com
     - iyes.youku.com
@@ -162,8 +162,8 @@ http:
     - device-box.onethingpcs.com
     - '*.anythinktech.com'
     - api.xueqiu.com
-    - 182.92.251.113
-    - 101.201.175.228
+    - '182.92.251.113'
+    - '101.201.175.228'
     - switch.jumpvg.com
     - mobilepaas.abchina.com.cn
     - api-one-wscn.awtmt.com
@@ -190,7 +190,7 @@ http:
     - td.cgmcare.cn
     - '*.yuanfudao.com'
     - wallpaper.soutushenqi.com
-    - 140.179.224.63
+    - '140.179.224.63'
     - ap.dongqiudi.com
     - apapia-sqk.manmanbuy.com
     - '*.tipatipa.xyz'
@@ -200,7 +200,7 @@ http:
     - api.wmpvp.com
     - gateway.abite.com
     - rengine-platform.llsapp.com
-    - 1jietu.com
+    - '1jietu.com'
     - bbs-api.miyoushe.com
     - tcmobileapi.17usoft.com
     - m.msyc.cc
@@ -269,7 +269,7 @@ http:
     - gateway.shouqiev.com
     - res.pizzahut.com.cn
     - api.caijingmobile.com
-    - 3g.csair.com
+    - '3g.csair.com'
     - client-api.oray.com
     - bgw.xinyue.qq.com
     - api-new.app.acfun.cn
@@ -279,7 +279,7 @@ http:
     - sh-gateway.shihuo.cn
     - wcprd.hilton.com
     - ad.12306.cn
-    - 103.91.210.141
+    - '103.91.210.141'
     - adx-cn.anythinktech.com
     - js-ad.ayximgs.com
     - api.dangdang.com
@@ -346,7 +346,7 @@ http:
     - '*.umetrip.com'
     - explorer.tratao.com
     - overseas.weico.cc
-    - 118.178.214.118
+    - '118.178.214.118'
     - '120.241.*'
     - dapis.mting.info
     - acs.m.taobao.com
@@ -390,7 +390,7 @@ http:
     - pss.txffp.com
     - m.sd.10086.cn
     - helper.2bulu.com
-    - 47.100.65.202
+    - '47.100.65.202'
     - api.weibo.cn
     - mapi.weibo.com
     - '*.uve.weibo.com'
@@ -409,9 +409,9 @@ http:
     - app.58.com
     - api.zhihu.com
     - res.xiaojukeji.com
-    - 116.85.2.15
-    - 116.85.2.14
-    - 212.129.159.79
+    - '116.85.2.15'
+    - '116.85.2.14'
+    - '212.129.159.79'
     - lchttpapi.xczim.com
     - business.msstatic.com
     - api.kkmh.com
@@ -445,8 +445,8 @@ http:
     - '*.hoopchina.com'
     - goblin.hupu.com
     - spclient.wg.spotify.com
-    - 180.96.8.44
-    - 125.215.147.40
+    - '180.96.8.44'
+    - '125.215.147.40'
 
   url-rewrite:
     - '^https?:\/\/2026.08.29/c415/v2.0.648 - reject-200'
@@ -925,215 +925,239 @@ http:
 
   script:
     - match: '^https?:\/\/api\.369cx\.cn\/v\d\/Splash\/GetSplashAd'
-      name: dict
+      name: 'dict'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+){1,4}(:\d+)?\/api\/v\d\/movie\/index_recommend'
-      name: 555Ad
+      name: '555Ad'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/www\.123pan\.com\/s\/[0-9a-zA-Z=_/-]+\.html'
-      name: 123pan
+      name: '123pan'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/ad\.12306\.cn\/ad\/ser\/getAdList'
-      name: 12306
+      name: '12306'
       type: request
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^http:\/\/[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+){1,4}(:\d+)?\/amdc\/mobileDispatch'
-      name: amdc
+      name: 'amdc'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/.*(xbwpys|ahhhhfs)\.com\/($|[0-9a-zA-Z_/]+\/$)'
-      name: ahfs
+      name: 'ahfs'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https:\/\/newclient\.map\.baidu\.com\/client\/phpui2\/\?qt=ads'
-      name: baidumap
+      name: 'baidumap'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/bp-api\.bestv\.com\.cn\/cms\/api\/audit\/home\/getCommonMixData'
-      name: baishitv
+      name: 'baishitv'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/gg\.caixin\.com\/s\?z=caixin&op=1&c=3362'
-      name: caixinads
+      name: 'caixinads'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/.*flyert.*\/source\/plugin\/mobile\/mobile\.php\?module=threadpost&.+?&page=1'
-      name: fly
+      name: 'fly'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/.*umetrip\.com\.cn\/gateway\/api\/umetrip\/native$'
-      name: hanglvzongheng
+      name: 'hanglvzongheng'
       type: response
       require-body: false
       timeout: 30
     - match: '^https?:\/\/.*cupid\.iqiyi\.com\/mixer\?'
-      name: iqiyi_open_ads
+      name: 'iqiyi_open_ads'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/napi\.ithome\.com\/api\/news\/indexv\d\/iphone'
-      name: ithome
+      name: 'ithome'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/api\.m\.jd\.com\/api\?functionId=delivery_show'
-      name: startup
+      name: 'startup'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/api\.m\.jd\.com\/client\.action\?functionId=(hotWords|hotSearchTerms)'
-      name: jd_json
+      name: 'jd_json'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/api\.coolapk\.com\/v6\/(feed\/(replyList|detail)|main\/indexV8|dataList)'
-      name: coolapk
+      name: 'coolapk'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/api.coolapk.com\/v6\/main\/init'
-      name: coolapk
+      name: 'coolapk'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/open-cms-api\.(uc|quark)\.cn\/open-cms'
-      name: quark
+      name: 'quark'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/mobilepaas\.abchina\.com\.cn:441\/mgw\.htm'
-      name: abchina
+      name: 'abchina'
       type: response
       require-body: false
       timeout: 30
     - match: '^https?:\/\/j1\.pupuapi\.com\/client\/marketing\/banner\/v\d\?position'
-      name: pupumarket
+      name: 'pupumarket'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/api\.jk\.cn\/m\.api'
-      name: pinganads
+      name: 'pinganads'
       type: response
       require-body: false
       timeout: 30
     - match: '^https?:\/\/apps\.teamair\.cn\/app\/version'
-      name: qidian
+      name: 'qidian'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: 'https://ccsp-egmas.sf-express.com/cx-app-base/base/app/ad/queryInfoFlow'
-      name: shunfeng_json
+      name: 'shunfeng_json'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/api\.shenyin\.name\/stay-fork\/browse\/featured$'
-      name: stay
+      name: 'stay'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/.*zdmimg\.com\/cpm\/api\/v\d\/advert_distribution\/get_all_advertise'
-      name: smzdm_json
+      name: 'smzdm_json'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/apiproxy\.zuche\.com\/resource\/cardes\/toufang\/marketing'
-      name: dict
+      name: 'dict'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/api\.zhihu\.com\/commercial_api.*launch_v2'
-      name: zhihu_openads
+      name: 'zhihu_openads'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
 
 script-providers:
-  dict:
+  'dict':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/dict.js
     interval: 86400
-  555Ad:
+  '555Ad':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/555Ad.js
     interval: 86400
-  123pan:
+  '123pan':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/123pan.js
     interval: 86400
-  12306:
+  '12306':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/12306.js
     interval: 86400
-  amdc:
+  'amdc':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/amdc.js
     interval: 86400
-  ahfs:
+  'ahfs':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/ahfs.js
     interval: 86400
-  baidumap:
+  'baidumap':
     url: https://raw.githubusercontent.com/app2smile/rules/master/js/baidumap.js
     interval: 86400
-  baishitv:
+  'baishitv':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/master/baishitv.js
     interval: 86400
-  caixinads:
+  'caixinads':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/caixinads.js
     interval: 86400
-  fly:
+  'fly':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/fly.js
     interval: 86400
-  hanglvzongheng:
+  'hanglvzongheng':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/hanglvzongheng.js
     interval: 86400
-  iqiyi_open_ads:
+  'iqiyi_open_ads':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/iqiyi_open_ads.js
     interval: 86400
-  ithome:
+  'ithome':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/ithome.js
     interval: 86400
-  startup:
+  'startup':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/startup.js
     interval: 86400
-  jd_json:
+  'jd_json':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/jd_json.js
     interval: 86400
-  coolapk:
+  'coolapk':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/coolapk.js
     interval: 86400
-  quark:
+  'quark':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/master/quark.js
     interval: 86400
-  abchina:
+  'abchina':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/master/abchina.js
     interval: 86400
-  pupumarket:
+  'pupumarket':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/master/pupumarket.js
     interval: 86400
-  pinganads:
+  'pinganads':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/master/pinganads.js
     interval: 86400
-  qidian:
+  'qidian':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/qidian.js
     interval: 86400
-  shunfeng_json:
+  'shunfeng_json':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/shunfeng_json.js
     interval: 86400
-  stay:
+  'stay':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/stay.js
     interval: 86400
-  smzdm_json:
+  'smzdm_json':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/smzdm_json.js
     interval: 86400
-  zhihu_openads:
+  'zhihu_openads':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/zhihu_openads.js
     interval: 86400
 
