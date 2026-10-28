@@ -135,6 +135,7 @@ class Model:
     license_file: str
     extra_rules: list[str]
     extra_rules_comment: str | None
+    header_notes: list[str] = field(default_factory=list)
 
 
 def fail(lineno: int, message: str) -> None:
@@ -801,6 +802,7 @@ def header_comments(model: Model) -> list[str]:
         f"# 上游：{model.source_url}",
         f"# 原作者：{model.author}（{model.homepage}）。著作权归原作者所有。",
         f"# 许可证：{license_text}，全文见 {model.license_file}。",
+        *[f"# {note}" for note in model.header_notes],
     ]
 
 
@@ -979,6 +981,52 @@ def validate_document(text: str, model: Model) -> None:
             raise ConvertError("missing extra-rules comment")
 
 
+def apply_local_edits(model: Model, edits: dict[str, object]) -> None:
+    """Drop pieces that are not needed for this Stash copy.
+
+    The Surge module is still converted in full. These edits run afterwards so
+    a daily sync cannot put the dropped host, script, or rule back.
+    """
+    omit_mitm = edits.get("omit_mitm") or []
+    omit_scripts = edits.get("omit_scripts") or []
+    omit_rules = edits.get("omit_rules_containing") or []
+    notes = edits.get("header_notes") or []
+    for label, value in (
+        ("omit_mitm", omit_mitm),
+        ("omit_scripts", omit_scripts),
+        ("omit_rules_containing", omit_rules),
+        ("header_notes", notes),
+    ):
+        if not isinstance(value, list) or not all(isinstance(item, str) and item for item in value):
+            raise ConvertError(f"{label} must be a list of non-empty strings")
+    if omit_mitm:
+        present = set(model.mitm)
+        missing = [host for host in omit_mitm if host not in present]
+        if missing:
+            raise ConvertError(f"local edit expected MITM hosts that are not in the module: {missing}")
+        model.mitm = [host for host in model.mitm if host not in set(omit_mitm)]
+        if not model.mitm:
+            raise ConvertError("local edit removed every MITM host")
+    if omit_scripts:
+        present = {script.name for script in model.scripts}
+        missing = [name for name in omit_scripts if name not in present]
+        if missing:
+            raise ConvertError(f"local edit expected scripts that are not in the module: {missing}")
+        model.scripts = [script for script in model.scripts if script.name not in set(omit_scripts)]
+        if not model.scripts:
+            raise ConvertError("local edit removed every script")
+    if omit_rules:
+        kept = [
+            rule
+            for rule in model.extra_rules
+            if not any(needle in rule for needle in omit_rules)
+        ]
+        if len(kept) == len(model.extra_rules):
+            raise ConvertError(f"local edit removed no rules matching {omit_rules}")
+        model.extra_rules = kept
+    model.header_notes = list(notes)
+
+
 def convert_sgmodule(
     text: str,
     *,
@@ -989,6 +1037,7 @@ def convert_sgmodule(
     license_file: str,
     extra_rules: list[str] | None = None,
     extra_rules_comment: str | None = None,
+    local_edits: dict[str, object] | None = None,
 ) -> str:
     original = normalize(text)
     if not source_url.startswith("https://"):
@@ -1016,6 +1065,10 @@ def convert_sgmodule(
     model.license_file = license_file
     model.extra_rules = list(extra_rules or [])
     model.extra_rules_comment = extra_rules_comment
+    if local_edits:
+        if not isinstance(local_edits, dict):
+            raise ConvertError("local_edits must be a mapping")
+        apply_local_edits(model, local_edits)
     return render_document(model)
 
 
@@ -1094,6 +1147,33 @@ hostname = %APPEND% *.example.com, -exclude.example.com
     assert "\n  'demo':\n" in rendered
     assert "\n  'on':\n" in rendered
     assert "arguments" not in loaded
+
+    edited = convert_sgmodule(
+        sample,
+        source_url="https://example.com/example.sgmodule",
+        author="Table Author",
+        homepage="https://example.com/home",
+        license_spdx="Apache-2.0",
+        license_file="Stash/LICENSES/example.txt",
+        extra_rules=[
+            "AND,((DOMAIN-SUFFIX,googlevideo.com),(PROTOCOL,QUIC)),REJECT",
+            "AND,((DOMAIN-SUFFIX,example.com),(PROTOCOL,QUIC)),REJECT",
+        ],
+        extra_rules_comment="quic",
+        local_edits={
+            "omit_mitm": ["*.example.com"],
+            "omit_scripts": ["on"],
+            "omit_rules_containing": ["googlevideo.com"],
+            "header_notes": ["本地调整：不解密视频 CDN"],
+        },
+    )
+    edited_doc = yaml.safe_load(edited)
+    assert edited_doc["http"]["mitm"] == ["-exclude.example.com"]
+    assert {item["name"] for item in edited_doc["http"]["script"]} == {"demo", "unlimited"}
+    assert edited_doc["rules"] == ["AND,((DOMAIN-SUFFIX,example.com),(PROTOCOL,QUIC)),REJECT"]
+    assert "本地调整：不解密视频 CDN" in edited
+    assert "googlevideo.com" not in edited
+    assert non_string_override_fields(edited_doc) is None
 
     broken = [
         sample.replace("[URL Rewrite]", "[Header Rewrite]"),

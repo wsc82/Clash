@@ -36,22 +36,35 @@ SOURCES: list[dict[str, object]] = [
         "license_spdx": "Apache-2.0",
         "license_url": "https://raw.githubusercontent.com/Maasea/sgmodule/master/LICENSE",
         "license_file": "Stash/scripts/Maasea/LICENSE",
-        # Protobuf descriptors are compiled into the scripts. The only extra
-        # runtime URL is a live worker; it is not a file we can mirror.
+        # Protobuf descriptors are compiled into the scripts. The initplayback
+        # worker is only reached from youtube.request.init, which local_edits
+        # drops. log_event still uses the same mirrored request.js.
         "runtime_notes": (
             "protobuf 描述已经编进脚本，没有单独的描述文件或参数文件。"
-            "youtube.request.js 在 initplayback 命中缓存 key 时会请求 "
-            "https://init-stream.maasea.workers.dev/ 。这是动态接口，地址写死在脚本里；"
-            "镜像必须与上游字节一致，所以不能把这个地址改成本仓库。"
-            "上游脚本文件被删时，去广告脚本仍从本仓库加载；该接口若同时不可用，只有这段 initplayback 重定向会受影响。"
+            "为避免播放转圈，这份覆写不解密 *.googlevideo.com，不引用 youtube.request.init，"
+            "也不拦 googlevideo 的 QUIC。去广告和后台播放仍由 youtube.response 处理 "
+            "youtubei.googleapis.com 的 player、next、browse 等响应。"
+            "youtube.request.js 的镜像保留，因为 log_event 还在用；"
+            "里面的 https://init-stream.maasea.workers.dev/ 只有 initplayback 分支会请求，"
+            "当前覆写不再走那条分支。"
         ),
-        # QUIC is blocked so YouTube falls back to TCP and MITM can see it.
-        # These are not in the upstream module.
-        "extra_rules_comment": "拦掉 YouTube 的 QUIC（UDP），让它回落到 TCP，这样 MitM 才能生效",
+        # Both QUIC rules are listed here. local_edits drops the googlevideo one
+        # after conversion, so a later edit cannot put that CDN back on TCP MITM.
+        "extra_rules_comment": "拦掉 youtubei.googleapis.com 的 QUIC（UDP），让接口回落到 TCP，这样 MitM 才能改 player 响应。不拦 googlevideo，避免视频流被强制走 TCP",
         "extra_rules": [
             "AND,((DOMAIN-SUFFIX,googlevideo.com),(PROTOCOL,QUIC)),REJECT",
             "AND,((DOMAIN-SUFFIX,youtubei.googleapis.com),(PROTOCOL,QUIC)),REJECT",
         ],
+        "local_edits": {
+            "omit_mitm": ["*.googlevideo.com"],
+            "omit_scripts": ["youtube.request.init"],
+            "omit_rules_containing": ["googlevideo.com"],
+            "header_notes": [
+                "本地调整（每天同步仍会保留）：不解密 *.googlevideo.com，并去掉它的 QUIC 拦截。视频 CDN 被中间人解密后，播放会长时间转圈。",
+                "去广告和后台播放都在 Maasea 的 youtube.response.js 里，改的是 youtubei.googleapis.com 的 player、next、browse 等响应，不碰 googlevideo。",
+                "已去掉 youtube.request.init。它只在 initplayback 上按缓存 key 重定向，字幕语言又是 off。youtube.request.js 的镜像还在，log_event 仍会用到。著作权仍归 Maasea。",
+            ],
+        },
     },
     {
         "output": "Stash/StartUpAds.stoverride",

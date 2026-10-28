@@ -23,7 +23,7 @@
 
 ## 许可证
 
-- `YouTube.stoverride` 转换自 [Maasea](https://github.com/Maasea/sgmodule) 的配置，许可证为 Apache-2.0。上游没有 NOTICE 文件。全文见 [scripts/Maasea/LICENSE](scripts/Maasea/LICENSE)。脚本镜像在 `scripts/Maasea/`，与上游字节相同。 protobuf 描述已经编进脚本，没有单独的描述文件或参数文件。youtube.request.js 在 initplayback 命中缓存 key 时会请求 https://init-stream.maasea.workers.dev/ 。这是动态接口，地址写死在脚本里；镜像必须与上游字节一致，所以不能把这个地址改成本仓库。上游脚本文件被删时，去广告脚本仍从本仓库加载；该接口若同时不可用，只有这段 initplayback 重定向会受影响。
+- `YouTube.stoverride` 转换自 [Maasea](https://github.com/Maasea/sgmodule) 的配置，许可证为 Apache-2.0。上游没有 NOTICE 文件。全文见 [scripts/Maasea/LICENSE](scripts/Maasea/LICENSE)。脚本镜像在 `scripts/Maasea/`，与上游字节相同。 protobuf 描述已经编进脚本，没有单独的描述文件或参数文件。为避免播放转圈，这份覆写不解密 *.googlevideo.com，不引用 youtube.request.init，也不拦 googlevideo 的 QUIC。去广告和后台播放仍由 youtube.response 处理 youtubei.googleapis.com 的 player、next、browse 等响应。youtube.request.js 的镜像保留，因为 log_event 还在用；里面的 https://init-stream.maasea.workers.dev/ 只有 initplayback 分支会请求，当前覆写不再走那条分支。
 - `StartUpAds.stoverride` 转换自 [ddgksf2013](https://github.com/ddgksf2013/Rewrite) 的配置。上游仓库没有 SPDX 许可证文件。配置原文要求「如需引用请注明出处」。脚本镜像在 `scripts/ddgksf2013/`，与上游字节相同。 其中 baidumap.js 来自 app2smile/rules（MIT），许可证全文见 scripts/app2smile/LICENSE.md。一条 script-analyze-echo-response（12306）转成了 request 脚本。以分号开头的禁用行被跳过，记在覆写末尾。
 - `CheLaiLeAds.stoverride` 转换自 [ddgksf2013](https://github.com/ddgksf2013/Rewrite) 的配置。上游仓库没有 SPDX 许可证文件。配置原文要求「如需引用请注明出处」。脚本镜像在 `scripts/ddgksf2013/`，与上游字节相同。
 - `AmapAds.stoverride` 转换自 [ddgksf2013](https://github.com/ddgksf2013/Rewrite) 的配置。上游仓库没有 SPDX 许可证文件。配置原文要求「如需引用请注明出处」。脚本镜像在 `scripts/ddgksf2013/`，与上游字节相同。 脚本匹配了 amdc.m.taobao.com，但上游 hostname 列表里没有这个域名。Stash 不会对它做 MitM，除非在别处加上该主机。
