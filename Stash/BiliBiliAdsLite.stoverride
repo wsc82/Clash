@@ -17,42 +17,49 @@ http:
 
   script:
     - match: '^https:\/\/app\.bilibili\.com\/x\/v2\/splash\/list'
-      name: bilibili.ads
+      name: 'bilibili.ads'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/app\.bilibili\.com\/x\/v2\/account\/myinfo\?'
-      name: bilibili.ads
+      name: 'bilibili.ads'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/app\.bilibili\.com\/x\/v2\/feed\/index'
-      name: bilibili.ads
+      name: 'bilibili.ads'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/app\.bilibili\.com\/x\/resource\/show\/tab'
-      name: bilibili.ads
+      name: 'bilibili.ads'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/app\.bilibili\.com\/x\/v2\/account\/mine'
-      name: bilibili.ads
+      name: 'bilibili.ads'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/app\.bilibili\.com\/x\/resource\/top\/activity'
-      name: bilibili.ads
+      name: 'bilibili.ads'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/app\.bilibili\.com\/x\/v2\/search\/square'
-      name: bilibili.ads
+      name: 'bilibili.ads'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
 
 script-providers:
-  bilibili.ads:
+  'bilibili.ads':
     url: https://ddgksf2013.top/scripts/bilibili.ads.js
     interval: 86400

@@ -28,61 +28,71 @@ http:
 
   script:
     - match: '^http:\/\/amdc\.m\.taobao\.com'
-      name: amdc
+      name: 'amdc'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/.*\.amap\.com\/ws\/message\/notice\/list'
-      name: amap
+      name: 'amap'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/.*\.amap\.com\/ws\/shield\/frogserver\/aocs\/updatable'
-      name: amap
+      name: 'amap'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/.*\.amap\.com\/ws\/shield\/search\/nearbyrec_smart'
-      name: amap
+      name: 'amap'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/.*\.amap\.com\/ws\/promotion-web\/resource'
-      name: amap
+      name: 'amap'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/.*\.amap\.com\/ws\/faas\/amap-navigation\/main-page'
-      name: amap
+      name: 'amap'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/.*\.amap\.com\/ws\/valueadded\/alimama\/splash_screen'
-      name: amap
+      name: 'amap'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/.*\.amap\.com\/ws\/msgbox\/pull'
-      name: amap
+      name: 'amap'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/.*\.amap\.com\/ws\/shield\/dsp\/profile\/index\/nodefaas'
-      name: amap
+      name: 'amap'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: '^https?:\/\/.*\.amap\.com\/ws\/shield\/search\/new_hotword'
-      name: amap
+      name: 'amap'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
 
 script-providers:
-  amdc:
+  'amdc':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/amdc.js
     interval: 86400
-  amap:
+  'amap':
     url: https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/amap.js
     interval: 86400
 

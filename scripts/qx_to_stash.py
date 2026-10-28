@@ -24,7 +24,7 @@ try:
 except ImportError:  # pragma: no cover
     yaml = None
 
-from surge_module_to_stash import ConvertError
+from surge_module_to_stash import STASH_MAX_SIZE_UNLIMITED, ConvertError, non_string_override_fields
 
 VALID_URL_REWRITE_ACTIONS = {
     "reject",
@@ -153,17 +153,38 @@ def parse_response_body_rewrite(rest: str) -> tuple[str, str]:
     return m.group(1), m.group(2)
 
 
+def yaml_force_quote(text: str) -> str:
+    """Single-quote a scalar so YAML cannot turn it into a number or bool."""
+    return "'" + text.replace("'", "''") + "'"
+
+
+def yaml_plain_string(text: str) -> bool:
+    """True when an unquoted scalar round-trips as the same string."""
+    if text == "" or text != text.strip():
+        return False
+    if text[0] in "-?:,[]{}#&*!|>'\"%@`~+0123456789":
+        return False
+    if any(ch in text for ch in ":#{}[]&*!|>'\"\\"):
+        return False
+    if re.search(r"\s", text):
+        return False
+    if text.lower() in {"true", "false", "null", "yes", "no", "on", "off", "y", "n", "~"}:
+        return False
+    if yaml is None:
+        return True
+    try:
+        loaded = yaml.safe_load("k: " + text + "\n")
+    except yaml.YAMLError:
+        return False
+    value = loaded.get("k") if isinstance(loaded, dict) else None
+    return isinstance(value, str) and value == text and list(loaded) == ["k"]
+
+
 def yaml_quote_scalar(s: str) -> str:
-    """Quote a scalar for a YAML flow/list item when needed."""
-    if s == "":
-        return "''"
-    # Prefer single quotes; escape existing singles by doubling
-    if any(ch in s for ch in ":#{}[]&*!|>%@`'\"\\") or s.strip() != s or s.startswith("-") or s.lower() in {"true", "false", "null", "yes", "no"}:
-        return "'" + s.replace("'", "''") + "'"
-    # also quote if starts with suspicious chars or contains spaces that confuse
-    if re.search(r"[\s]", s) or s.startswith(("*", "&", "!", "%", "@", "`")):
-        return "'" + s.replace("'", "''") + "'"
-    return s
+    """Quote a scalar when YAML would coerce it or the syntax is unsafe."""
+    if yaml_plain_string(s):
+        return s
+    return yaml_force_quote(s)
 
 
 def convert(text: str, meta: Meta, *, strict: bool = True) -> ConvertResult:
@@ -330,6 +351,11 @@ def convert(text: str, meta: Meta, *, strict: bool = True) -> ConvertResult:
                 "require-body": require_body,
                 "timeout": 30,
             }
+            # QX rewrite lines have no max-size. Body scripts still need an
+            # explicit Stash ceiling: the wiki does not define 0, -1, or a
+            # default, and a body over max-size never runs the script.
+            if require_body:
+                entry["max-size"] = STASH_MAX_SIZE_UNLIMITED
             if action == "script-analyze-echo-response":
                 result.notes.append(
                     f"L{lineno} script-analyze-echo-response -> request script "
@@ -409,16 +435,18 @@ def render_stoverride(result: ConvertResult) -> str:
         lines.append("  script:")
         for sc in result.scripts:
             lines.append(f"    - match: {yaml_quote_scalar(sc['match'])}")
-            lines.append(f"      name: {yaml_quote_scalar(sc['name'])}")
+            lines.append(f"      name: {yaml_force_quote(sc['name'])}")
             lines.append(f"      type: {sc['type']}")
             lines.append(f"      require-body: {'true' if sc['require-body'] else 'false'}")
+            if "max-size" in sc:
+                lines.append(f"      max-size: {sc['max-size']}")
             lines.append(f"      timeout: {sc['timeout']}")
         lines.append("")
 
     if result.script_providers:
         lines.append("script-providers:")
         for name, prov in result.script_providers.items():
-            lines.append(f"  {yaml_quote_scalar(name)}:")
+            lines.append(f"  {yaml_force_quote(name)}:")
             lines.append(f"    url: {prov['url']}")
             lines.append(f"    interval: {prov['interval']}")
         lines.append("")
@@ -450,6 +478,9 @@ def validate_output(text: str) -> None:
     data = yaml.safe_load(text)
     if not isinstance(data, dict):
         raise ValueError("override root must be a mapping")
+    coerced = non_string_override_fields(data)
+    if coerced:
+        raise ConvertError(f"generated override is not safe for Stash: {coerced}")
     http = data.get("http") or {}
     for item in http.get("url-rewrite") or []:
         if not isinstance(item, str):
@@ -571,6 +602,8 @@ def self_check() -> None:
             "hostname = *.example.com, example.com",
             r"^https://example\.com/ad url reject-200",
             r"^https://example\.com/api url script-response-body https://example.com/demo.js",
+            r"^https://example\.com/n url script-response-body https://example.com/12306.js",
+            r"^https://example\.com/hdr url script-response-header https://example.com/hdr.js",
             r";^https://example\.com/old url reject",
             "",
         ]
@@ -589,6 +622,18 @@ def self_check() -> None:
     ):
         if snippet not in rendered:
             raise ConvertError(f"qx self-check output missing {snippet!r}")
+    loaded = yaml.safe_load(rendered)
+    by_name = {item["name"]: item for item in loaded["http"]["script"]}
+    if by_name["demo"]["max-size"] != STASH_MAX_SIZE_UNLIMITED:
+        raise ConvertError("body script did not receive the unlimited max-size ceiling")
+    if "max-size" in by_name["hdr"]:
+        raise ConvertError("header script should not receive a body max-size")
+    if not isinstance(by_name["12306"]["name"], str) or by_name["12306"]["match"] == 12306:
+        raise ConvertError("numeric script name was coerced")
+    if "name: '12306'" not in rendered or "\n  '12306':\n" not in rendered:
+        raise ConvertError("numeric script name was not quoted")
+    if not all(isinstance(host, str) for host in loaded["http"]["mitm"]):
+        raise ConvertError("mitm host was coerced")
     validate_output(rendered)
     bad = text + "\n" + r"^https://example\.com/x url echo-response text/plain echo-response https://example.com/body" + "\n"
     try:

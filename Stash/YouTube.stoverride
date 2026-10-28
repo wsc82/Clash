@@ -14,31 +14,34 @@ http:
 
   script:
     - match: ^https:\/\/youtubei\.googleapis\.com\/(youtubei\/v1\/(browse|next|player|search|reel\/reel_watch_sequence|guide|account\/get_setting|get_watch|log_event|config))(\?(.*))?$
-      name: youtube.response
+      name: 'youtube.response'
       type: response
       require-body: true
       binary-mode: true
+      max-size: 10485760
       argument: '{"captionLang":"off","blockUpload":true,"blockImmersive":true,"blockShorts":false,"debug":false}'
     - match: ^https?:\/\/[\w-]+\.googlevideo\.com\/initplayback.+&ack.*
-      name: youtube.request.init
+      name: 'youtube.request.init'
       type: request
       require-body: true
       binary-mode: true
+      max-size: 10485760
       argument: '{"captionLang":"off"}'
     - match: ^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/log_event
-      name: youtube.request.log_event
+      name: 'youtube.request.log_event'
       type: request
       require-body: true
       binary-mode: true
+      max-size: 10485760
 
 script-providers:
-  youtube.response:
+  'youtube.response':
     url: https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.response.js
     interval: 86400
-  youtube.request.init:
+  'youtube.request.init':
     url: https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.request.js
     interval: 86400
-  youtube.request.log_event:
+  'youtube.request.log_event':
     url: https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.request.js
     interval: 86400
 

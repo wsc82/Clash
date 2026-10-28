@@ -25,6 +25,13 @@ except ImportError as exc:  # pragma: no cover - installed by the workflow
 
 
 SCRIPT_INTERVAL = 86400
+# Surge uses max-size=-1 for no limit:
+# https://manual.nssurge.com/scripting/http-response.html
+# Stash only documents max-size as a byte ceiling. A body larger than that
+# value does not trigger the script, and the docs never say that 0 or -1
+# means unlimited: https://stash.wiki/en/script/rewrite-requests
+# 10 MiB is the explicit ceiling used for Surge's unlimited value.
+STASH_MAX_SIZE_UNLIMITED = 10 * 1024 * 1024
 LICENSE_URLS = {
     "Apache-2.0": "http://www.apache.org/licenses/LICENSE-2.0",
 }
@@ -453,6 +460,10 @@ def convert_script(line: str) -> Script:
         script.require_body = parse_bool(params["requires-body"], "requires-body")
     if "binary-body-mode" in params:
         script.binary_mode = parse_bool(params["binary-body-mode"], "binary-body-mode")
+    # An omitted timeout keeps Surge's 5 second default
+    # (https://manual.nssurge.com/scripting/overview.html). Stash describes
+    # timeout in seconds and marks it optional, without a different default
+    # (https://stash.wiki/en/script/rewrite-requests), so it is not filled in.
     if "timeout" in params:
         raw = params["timeout"].strip()
         if not re.fullmatch(r"\d+", raw):
@@ -463,11 +474,12 @@ def convert_script(line: str) -> Script:
         if not re.fullmatch(r"-?\d+", raw):
             raise ConvertError(f"script {name} has an invalid max-size: {raw}")
         size = int(raw)
-        # -1 means unlimited in Surge. Omit it so the Stash default applies.
-        if size != -1:
-            if size < 0:
-                raise ConvertError(f"script {name} has an invalid max-size: {raw}")
+        if size == -1:
+            script.max_size = STASH_MAX_SIZE_UNLIMITED
+        elif size >= 0:
             script.max_size = size
+        else:
+            raise ConvertError(f"script {name} has an invalid max-size: {raw}")
     if "argument" in params:
         argument = params["argument"]
         if argument[:1] in "{[":
@@ -631,6 +643,47 @@ def parse_module(text: str) -> tuple[dict[str, str], Model]:
     return meta, model
 
 
+def non_string_override_fields(loaded: object) -> str | None:
+    """Return an error when a Stash string field was parsed as another type.
+
+    Stash rejects an integer or boolean where it expects a string. ``12306``
+    and ``on`` are the usual cases.
+    """
+    if not isinstance(loaded, dict):
+        return "override root is not a mapping"
+    for key in ("name", "desc", "author", "homepage", "icon", "category"):
+        if key in loaded and not isinstance(loaded[key], str):
+            return f"{key} is {type(loaded[key]).__name__}, expected a string"
+    http = loaded.get("http") or {}
+    if http and not isinstance(http, dict):
+        return "http is not a mapping"
+    if isinstance(http, dict):
+        for host in http.get("mitm") or []:
+            if not isinstance(host, str):
+                return f"mitm host is {type(host).__name__}, expected a string: {host!r}"
+        for section in ("url-rewrite", "body-rewrite"):
+            for item in http.get(section) or []:
+                if not isinstance(item, str):
+                    return f"{section} entry is {type(item).__name__}, expected a string: {item!r}"
+        for script in http.get("script") or []:
+            if not isinstance(script, dict):
+                return "script entry is not a mapping"
+            for key in ("name", "match", "type", "argument"):
+                if key in script and not isinstance(script[key], str):
+                    return f"script {key} is {type(script[key]).__name__}, expected a string: {script.get(key)!r}"
+    providers = loaded.get("script-providers") or {}
+    if providers and not isinstance(providers, dict):
+        return "script-providers is not a mapping"
+    if isinstance(providers, dict):
+        for key in providers:
+            if not isinstance(key, str):
+                return f"script-providers key is {type(key).__name__}, expected a string: {key!r}"
+    for rule in loaded.get("rules") or []:
+        if not isinstance(rule, str):
+            return f"rule is {type(rule).__name__}, expected a string: {rule!r}"
+    return None
+
+
 def yaml_quote(text: str) -> str:
     if "\n" not in text and "\r" not in text and "'" not in text:
         return "'" + text + "'"
@@ -694,7 +747,8 @@ def render_entries(entries: list[Entry]) -> list[str]:
 def render_script(script: Script) -> list[str]:
     rows: list[tuple[str, str]] = [
         ("match", yaml_mapping_scalar(script.match)),
-        ("name", yaml_mapping_scalar(script.name)),
+        # Always quote. A bare name such as 12306 or on is an integer or bool.
+        ("name", yaml_quote(script.name)),
         ("type", script.type),
     ]
     if script.require_body is not None:
@@ -793,7 +847,7 @@ def render_document(model: Model) -> str:
         lines.append("")
         lines.append("script-providers:")
         for script in model.scripts:
-            lines.append(f"  {yaml_key(script.name)}:")
+            lines.append(f"  {yaml_quote(script.name)}:")
             lines.append("    url: " + yaml_mapping_scalar(script.script_path))
             lines.append(f"    interval: {SCRIPT_INTERVAL}")
     if model.extra_rules:
@@ -819,6 +873,9 @@ def validate_document(text: str, model: Model) -> None:
         raise ConvertError(f"generated override is not valid YAML: {exc}") from exc
     if not isinstance(loaded, dict):
         raise ConvertError("generated override is not a YAML mapping")
+    coerced = non_string_override_fields(loaded)
+    if coerced:
+        raise ConvertError(f"generated override is not safe for Stash: {coerced}")
     if "arguments" in loaded:
         raise ConvertError("generated override uses the Stash arguments field")
     expected_top = {"name", "desc", "author", "homepage", "http", "rules"}
@@ -986,6 +1043,8 @@ http-response ^https://example\\.com/page foo bar baz qux
 
 [Script]
 demo = type=http-response,pattern=^https://example\\.com/,requires-body=1,binary-body-mode=0,timeout=30,max-size=1024,script-path=https://example.com/demo.js,argument="{"blockUpload":{{{屏蔽上传按钮}}},"blockShorts":{{{屏蔽Shorts按钮}}}}"
+unlimited = type=http-response,pattern=^https://example\\.com/player,requires-body=1,binary-body-mode=1,max-size=-1,script-path=https://example.com/player.js
+on = type=http-request,pattern=^https://example\\.com/on,requires-body=0,script-path=https://example.com/on.js
 
 [MITM]
 hostname = %APPEND% *.example.com, -exclude.example.com
@@ -1022,9 +1081,18 @@ hostname = %APPEND% *.example.com, -exclude.example.com
     assert bodies[1] == "^https://example\\.com/page response-replace-regex foo bar baz qux"
     argument = json.loads(loaded["http"]["script"][0]["argument"])
     assert argument == {"blockUpload": True, "blockShorts": False}
-    assert loaded["http"]["script"][0]["binary-mode"] is False
-    assert loaded["http"]["script"][0]["timeout"] == 30
-    assert loaded["http"]["script"][0]["max-size"] == 1024
+    by_name = {item["name"]: item for item in loaded["http"]["script"]}
+    assert by_name["demo"]["binary-mode"] is False
+    assert by_name["demo"]["timeout"] == 30
+    assert by_name["demo"]["max-size"] == 1024
+    assert by_name["unlimited"]["binary-mode"] is True
+    assert by_name["unlimited"]["max-size"] == STASH_MAX_SIZE_UNLIMITED
+    assert "timeout" not in by_name["unlimited"]
+    assert by_name["on"]["name"] == "on"
+    assert "name: 'demo'" in rendered
+    assert "name: 'on'" in rendered
+    assert "\n  'demo':\n" in rendered
+    assert "\n  'on':\n" in rendered
     assert "arguments" not in loaded
 
     broken = [

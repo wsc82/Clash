@@ -23,17 +23,19 @@ http:
 
   script:
     - match: 'https://.*miguvideo\.com\/app-management\/v\d\/staticcache\/navigation-list\/miguvideo\/ios'
-      name: migu.ads
+      name: 'migu.ads'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
     - match: 'https://.*miguvideo\.com\/display\/v\d\/static\/PERSONAL_CENTER'
-      name: migu.ads
+      name: 'migu.ads'
       type: response
       require-body: true
+      max-size: 10485760
       timeout: 30
 
 script-providers:
-  migu.ads:
+  'migu.ads':
     url: https://ddgksf2013.top/scripts/migu.ads.js
     interval: 86400
