@@ -5,6 +5,7 @@
 # 本地调整（每天同步仍会保留）：不解密 *.googlevideo.com，并去掉它的 QUIC 拦截。视频 CDN 被中间人解密后，播放会长时间转圈。
 # 去广告和后台播放都在 Maasea 的 youtube.response.js 里，改的是 youtubei.googleapis.com 的 player、next、browse 等响应，不碰 googlevideo。
 # 已去掉 youtube.request.init。它只在 initplayback 上按缓存 key 重定向，字幕语言又是 off。youtube.request.js 的镜像还在，log_event 仍会用到。著作权仍归 Maasea。
+# player 单独写成 youtube.response.player，max-size 为 10MiB，后台播放才改得到大的 player 响应。browse、next 等其它路径和 log_event 不写 max-size，沿用 Stash 默认上限。以前给所有路径都放 10MiB，Stash 会去跑很大的 next/browse 响应，视频页标题、频道和评论会长时间停在灰色占位。两条 response 仍指向同一个脚本地址。
 name: Youtube (Music) Enhance
 desc: 适用于 Youtube & Youtube Music
 author: Maasea
@@ -15,21 +16,29 @@ http:
     - youtubei.googleapis.com
 
   script:
-    - match: ^https:\/\/youtubei\.googleapis\.com\/(youtubei\/v1\/(browse|next|player|search|reel\/reel_watch_sequence|guide|account\/get_setting|get_watch|log_event|config))(\?(.*))?$
-      name: 'youtube.response'
+    - match: ^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/player(\?(.*))?$
+      name: 'youtube.response.player'
       type: response
       require-body: true
       binary-mode: true
       max-size: 10485760
+      argument: '{"captionLang":"off","blockUpload":true,"blockImmersive":true,"blockShorts":false,"debug":false}'
+    - match: ^https:\/\/youtubei\.googleapis\.com\/(youtubei\/v1\/(browse|next|search|reel\/reel_watch_sequence|guide|account\/get_setting|get_watch|log_event|config))(\?(.*))?$
+      name: 'youtube.response'
+      type: response
+      require-body: true
+      binary-mode: true
       argument: '{"captionLang":"off","blockUpload":true,"blockImmersive":true,"blockShorts":false,"debug":false}'
     - match: ^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/log_event
       name: 'youtube.request.log_event'
       type: request
       require-body: true
       binary-mode: true
-      max-size: 10485760
 
 script-providers:
+  'youtube.response.player':
+    url: https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.response.js
+    interval: 86400
   'youtube.response':
     url: https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.response.js
     interval: 86400
