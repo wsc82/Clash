@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 try:
     import yaml
@@ -981,24 +981,87 @@ def validate_document(text: str, model: Model) -> None:
             raise ConvertError("missing extra-rules comment")
 
 
+def _string_list(value: object, label: str) -> list[str]:
+    if not isinstance(value, list) or not all(isinstance(item, str) and item for item in value):
+        raise ConvertError(f"{label} must be a list of non-empty strings")
+    return list(value)
+
+
+def _split_one(original: Script, part: object, index: int) -> Script:
+    if not isinstance(part, dict):
+        raise ConvertError("split_scripts part must be a mapping")
+    name = part.get("name")
+    match = part.get("match")
+    if not isinstance(name, str) or not name or not isinstance(match, str) or not match:
+        raise ConvertError(f"split_scripts part {index} needs a name and a match")
+    if "max_size" in part and part.get("omit_max_size") is True:
+        raise ConvertError(f"split_scripts {name} sets both max_size and omit_max_size")
+    if part.get("omit_max_size") is True:
+        max_size = None
+    elif "max_size" in part:
+        raw = part["max_size"]
+        if isinstance(raw, bool) or not isinstance(raw, int) or raw < 0:
+            raise ConvertError(f"split_scripts {name} max_size must be a non-negative integer")
+        max_size = raw
+    else:
+        max_size = original.max_size
+    return replace(original, name=name, match=match, max_size=max_size)
+
+
+def _split_scripts(model: Model, specs: object) -> None:
+    """Replace one script with several entries that share its script URL."""
+    if not specs:
+        return
+    if not isinstance(specs, list):
+        raise ConvertError("split_scripts must be a list")
+    by_name = {script.name: script for script in model.scripts}
+    replacements: dict[str, list[Script]] = {}
+    for spec in specs:
+        if not isinstance(spec, dict):
+            raise ConvertError("split_scripts entry must be a mapping")
+        source_name = spec.get("from")
+        if not isinstance(source_name, str) or source_name not in by_name:
+            raise ConvertError(f"split_scripts expected script {source_name!r}")
+        parts = spec.get("parts")
+        if not isinstance(parts, list) or len(parts) < 2:
+            raise ConvertError(f"split_scripts {source_name} needs at least two parts")
+        replacements[source_name] = [
+            _split_one(by_name[source_name], part, index) for index, part in enumerate(parts)
+        ]
+    scripts: list[Script] = []
+    for script in model.scripts:
+        scripts.extend(replacements.get(script.name, [script]))
+    names = [script.name for script in scripts]
+    if len(names) != len(set(names)):
+        raise ConvertError(f"local edit produced duplicate script names: {names}")
+    model.scripts = scripts
+
+
+def _clear_max_size(model: Model, names: list[str]) -> None:
+    if not names:
+        return
+    present = {script.name for script in model.scripts}
+    missing = [name for name in names if name not in present]
+    if missing:
+        raise ConvertError(f"omit_max_size expected scripts that are not present: {missing}")
+    drop = set(names)
+    for script in model.scripts:
+        if script.name in drop:
+            script.max_size = None
+
+
 def apply_local_edits(model: Model, edits: dict[str, object]) -> None:
-    """Drop pieces that are not needed for this Stash copy.
+    """Adjust the converted module for this Stash copy.
 
     The Surge module is still converted in full. These edits run afterwards so
-    a daily sync cannot put the dropped host, script, or rule back.
+    a daily sync cannot put a dropped host, script, or rule back, and cannot
+    merge a split script into one large-body rule again.
     """
-    omit_mitm = edits.get("omit_mitm") or []
-    omit_scripts = edits.get("omit_scripts") or []
-    omit_rules = edits.get("omit_rules_containing") or []
-    notes = edits.get("header_notes") or []
-    for label, value in (
-        ("omit_mitm", omit_mitm),
-        ("omit_scripts", omit_scripts),
-        ("omit_rules_containing", omit_rules),
-        ("header_notes", notes),
-    ):
-        if not isinstance(value, list) or not all(isinstance(item, str) and item for item in value):
-            raise ConvertError(f"{label} must be a list of non-empty strings")
+    omit_mitm = _string_list(edits.get("omit_mitm") or [], "omit_mitm")
+    omit_scripts = _string_list(edits.get("omit_scripts") or [], "omit_scripts")
+    omit_rules = _string_list(edits.get("omit_rules_containing") or [], "omit_rules_containing")
+    notes = _string_list(edits.get("header_notes") or [], "header_notes")
+    omit_max_size = _string_list(edits.get("omit_max_size") or [], "omit_max_size")
     if omit_mitm:
         present = set(model.mitm)
         missing = [host for host in omit_mitm if host not in present]
@@ -1024,6 +1087,8 @@ def apply_local_edits(model: Model, edits: dict[str, object]) -> None:
         if len(kept) == len(model.extra_rules):
             raise ConvertError(f"local edit removed no rules matching {omit_rules}")
         model.extra_rules = kept
+    _split_scripts(model, edits.get("split_scripts") or [])
+    _clear_max_size(model, omit_max_size)
     model.header_notes = list(notes)
 
 
@@ -1174,6 +1239,60 @@ hostname = %APPEND% *.example.com, -exclude.example.com
     assert "本地调整：不解密视频 CDN" in edited
     assert "googlevideo.com" not in edited
     assert non_string_override_fields(edited_doc) is None
+
+    split = convert_sgmodule(
+        "\n".join(
+            [
+                "#!name=Split",
+                "#!desc=Split desc",
+                "[Script]",
+                "wide = type=http-response,pattern=^https://example\\.com/(player|next),requires-body=1,binary-body-mode=1,max-size=-1,script-path=https://example.com/wide.js,argument={\"a\":1}",
+                "log = type=http-request,pattern=^https://example\\.com/log,requires-body=1,binary-body-mode=1,max-size=-1,script-path=https://example.com/log.js",
+                "[MITM]",
+                "hostname = example.com",
+                "",
+            ]
+        ),
+        source_url="https://example.com/split.sgmodule",
+        author="Table Author",
+        homepage="https://example.com/home",
+        license_spdx="Apache-2.0",
+        license_file="Stash/LICENSES/example.txt",
+        local_edits={
+            "split_scripts": [
+                {
+                    "from": "wide",
+                    "parts": [
+                        {
+                            "name": "wide.player",
+                            "match": r"^https://example\.com/player",
+                            "max_size": STASH_MAX_SIZE_UNLIMITED,
+                        },
+                        {
+                            "name": "wide",
+                            "match": r"^https://example\.com/next",
+                            "omit_max_size": True,
+                        },
+                    ],
+                }
+            ],
+            "omit_max_size": ["log"],
+            "header_notes": ["player 单独放大 body 上限"],
+        },
+    )
+    split_doc = yaml.safe_load(split)
+    split_scripts = split_doc["http"]["script"]
+    assert [item["name"] for item in split_scripts] == ["wide.player", "wide", "log"]
+    assert split_scripts[0]["max-size"] == STASH_MAX_SIZE_UNLIMITED
+    assert "max-size" not in split_scripts[1]
+    assert "max-size" not in split_scripts[2]
+    assert split_scripts[0]["argument"] == '{"a":1}'
+    assert split_scripts[1]["binary-mode"] is True
+    providers = split_doc["script-providers"]
+    assert providers["wide.player"]["url"] == providers["wide"]["url"] == "https://example.com/wide.js"
+    assert all(isinstance(name, str) for name in providers)
+    assert "name: 'wide.player'" in split and "\n  'wide.player':\n" in split
+    assert non_string_override_fields(split_doc) is None
 
     broken = [
         sample.replace("[URL Rewrite]", "[Header Rewrite]"),

@@ -42,11 +42,14 @@ SOURCES: list[dict[str, object]] = [
         "runtime_notes": (
             "protobuf 描述已经编进脚本，没有单独的描述文件或参数文件。"
             "为避免播放转圈，这份覆写不解密 *.googlevideo.com，不引用 youtube.request.init，"
-            "也不拦 googlevideo 的 QUIC。去广告和后台播放仍由 youtube.response 处理 "
-            "youtubei.googleapis.com 的 player、next、browse 等响应。"
+            "也不拦 googlevideo 的 QUIC。"
+            "后台播放只改 player 响应，所以只有 youtube.response.player 使用 10MiB 的 max-size。"
+            "browse、next 等其它响应和 log_event 不写 max-size，沿用 Stash 默认上限；"
+            "给这些路径也放 10MiB 时，Stash 会去跑很大的响应，视频页标题和评论会长时间停在灰色占位。"
+            "两条 response 脚本共用同一个 youtube.response.js 地址，镜像切换时一起换。"
             "youtube.request.js 的镜像保留，因为 log_event 还在用；"
             "里面的 https://init-stream.maasea.workers.dev/ 只有 initplayback 分支会请求，"
-            "当前覆写不再走那条分支。"
+            "当前覆写不再走那条分支。著作权仍归 Maasea。"
         ),
         # Both QUIC rules are listed here. local_edits drops the googlevideo one
         # after conversion, so a later edit cannot put that CDN back on TCP MITM.
@@ -59,10 +62,29 @@ SOURCES: list[dict[str, object]] = [
             "omit_mitm": ["*.googlevideo.com"],
             "omit_scripts": ["youtube.request.init"],
             "omit_rules_containing": ["googlevideo.com"],
+            "split_scripts": [
+                {
+                    "from": "youtube.response",
+                    "parts": [
+                        {
+                            "name": "youtube.response.player",
+                            "match": r"^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/player(\?(.*))?$",
+                            "max_size": 10485760,
+                        },
+                        {
+                            "name": "youtube.response",
+                            "match": r"^https:\/\/youtubei\.googleapis\.com\/(youtubei\/v1\/(browse|next|search|reel\/reel_watch_sequence|guide|account\/get_setting|get_watch|log_event|config))(\?(.*))?$",
+                            "omit_max_size": True,
+                        },
+                    ],
+                }
+            ],
+            "omit_max_size": ["youtube.request.log_event"],
             "header_notes": [
                 "本地调整（每天同步仍会保留）：不解密 *.googlevideo.com，并去掉它的 QUIC 拦截。视频 CDN 被中间人解密后，播放会长时间转圈。",
                 "去广告和后台播放都在 Maasea 的 youtube.response.js 里，改的是 youtubei.googleapis.com 的 player、next、browse 等响应，不碰 googlevideo。",
                 "已去掉 youtube.request.init。它只在 initplayback 上按缓存 key 重定向，字幕语言又是 off。youtube.request.js 的镜像还在，log_event 仍会用到。著作权仍归 Maasea。",
+                "player 单独写成 youtube.response.player，max-size 为 10MiB，后台播放才改得到大的 player 响应。browse、next 等其它路径和 log_event 不写 max-size，沿用 Stash 默认上限。以前给所有路径都放 10MiB，Stash 会去跑很大的 next/browse 响应，视频页标题、频道和评论会长时间停在灰色占位。两条 response 仍指向同一个脚本地址。",
             ],
         },
     },
