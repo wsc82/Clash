@@ -502,6 +502,9 @@ def process_source(
                 try:
                     decoded = body.decode("utf-8")
                     if kind == "surge-sgmodule":
+                        edits = source.get("local_edits")
+                        if edits is not None and not isinstance(edits, dict):
+                            raise ConvertError(f"{label} local_edits must be a mapping")
                         fresh = convert_sgmodule(
                             decoded,
                             source_url=str(source["source_url"]),
@@ -515,6 +518,7 @@ def process_source(
                                 if isinstance(source.get("extra_rules_comment"), str)
                                 else None
                             ),
+                            local_edits=edits if isinstance(edits, dict) else None,
                         )
                     else:
                         override_name = source.get("name")
