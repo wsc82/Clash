@@ -1,0 +1,16 @@
+# 来源：https://raw.githubusercontent.com/wsc82/Surge/main/Ruleset/YouTube.list
+# 由 Surge 规则自动转换生成，请勿手工修改。
+payload:
+  # > YouTube
+  - DOMAIN-SUFFIX,googlevideo.com
+  - DOMAIN-SUFFIX,gvt0.com
+  - DOMAIN-SUFFIX,gvt1.com
+  - DOMAIN-SUFFIX,gvt2.com
+  - DOMAIN-SUFFIX,gvt3.com
+  - DOMAIN-SUFFIX,oauth2.googleapis.com
+  - DOMAIN-SUFFIX,oauthaccountmanager.googleapis.com
+  - DOMAIN-SUFFIX,youtu.be
+  - DOMAIN-SUFFIX,yt.be
+  - DOMAIN-SUFFIX,yt3.ggpht.com
+  - DOMAIN-SUFFIX,ytimg.com
+  - DOMAIN-KEYWORD,youtube
