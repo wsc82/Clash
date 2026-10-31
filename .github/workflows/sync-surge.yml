@@ -30,6 +30,7 @@ jobs:
           APPLEPUSH_URL: https://raw.githubusercontent.com/wsc82/Surge/main/Ruleset/ApplePush.list
           YOUTUBE_URL: https://raw.githubusercontent.com/wsc82/Surge/main/Ruleset/YouTube.list
           TELEGRAM_URL: https://raw.githubusercontent.com/wsc82/Surge/main/Ruleset/Telegram.list
+          AI_URL: https://raw.githubusercontent.com/wsc82/Surge/main/Ruleset/AI.list
         run: |
           set -euo pipefail
           mkdir -p /tmp/surge Ruleset
@@ -38,18 +39,20 @@ jobs:
           curl -fsSL --retry 5 --retry-delay 2 -o /tmp/surge/ApplePush.list "$APPLEPUSH_URL"
           curl -fsSL --retry 5 --retry-delay 2 -o /tmp/surge/YouTube.list "$YOUTUBE_URL"
           curl -fsSL --retry 5 --retry-delay 2 -o /tmp/surge/Telegram.list "$TELEGRAM_URL"
+          curl -fsSL --retry 5 --retry-delay 2 -o /tmp/surge/AI.list "$AI_URL"
           python3 scripts/surge_to_clash.py /tmp/surge/Global.list Ruleset/Global.yaml --source "$GLOBAL_URL"
           python3 scripts/surge_to_clash.py /tmp/surge/Domestic.list Ruleset/Domestic.yaml --source "$DOMESTIC_URL"
           python3 scripts/surge_to_clash.py /tmp/surge/ApplePush.list Ruleset/ApplePush.yaml --source "$APPLEPUSH_URL"
           python3 scripts/surge_to_clash.py /tmp/surge/YouTube.list Ruleset/YouTube.yaml --source "$YOUTUBE_URL"
           python3 scripts/surge_to_clash.py /tmp/surge/Telegram.list Ruleset/Telegram.yaml --source "$TELEGRAM_URL"
+          python3 scripts/surge_to_clash.py /tmp/surge/AI.list Ruleset/AI.yaml --source "$AI_URL"
 
       - name: Commit and push when the rules changed
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- Ruleset/Global.yaml Ruleset/Domestic.yaml Ruleset/ApplePush.yaml Ruleset/YouTube.yaml Ruleset/Telegram.yaml
+          git add -- Ruleset/Global.yaml Ruleset/Domestic.yaml Ruleset/ApplePush.yaml Ruleset/YouTube.yaml Ruleset/Telegram.yaml Ruleset/AI.yaml
           if git diff --cached --quiet; then
             echo "No rule changes."
             exit 0
