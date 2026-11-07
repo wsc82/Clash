@@ -158,6 +158,9 @@ payload:
   - DOMAIN-SUFFIX,vercel-storage.com
   - DOMAIN-KEYWORD,cursor
 
+  # > Discord
+  - DOMAIN-KEYWORD,discord
+
   # > Dropbox
   - DOMAIN-SUFFIX,db.tt
   - DOMAIN-SUFFIX,paper-attachments.s3.amazonaws.com
