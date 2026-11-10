@@ -1,6 +1,13 @@
 # 来源：https://raw.githubusercontent.com/wsc82/Surge/main/Ruleset/AI.list
 # 由 Surge 规则自动转换生成，请勿手工修改。
 payload:
+  # > Claude
+  - DOMAIN-SUFFIX,anthropic.com
+  - DOMAIN-SUFFIX,clau.de
+  - DOMAIN-SUFFIX,claude.ai
+  - DOMAIN-SUFFIX,claude.com
+  - DOMAIN-SUFFIX,claudeusercontent.com
+
   # > Cursor
   - DOMAIN-SUFFIX,vercel-storage.com
   - DOMAIN-KEYWORD,cursor
