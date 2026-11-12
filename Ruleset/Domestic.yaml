@@ -1,10 +1,6 @@
 # 来源：https://raw.githubusercontent.com/wsc82/Surge/main/Ruleset/Domestic.list
 # 由 Surge 规则自动转换生成，请勿手工修改。
 payload:
-  # > Cursor
-  - DOMAIN-SUFFIX,cursor.sh
-  - DOMAIN-SUFFIX,cursorvm.com
-
   # > MyList
   - DOMAIN-SUFFIX,bdurl.net
   - DOMAIN-SUFFIX,bytedance.com

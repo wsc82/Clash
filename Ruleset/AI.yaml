@@ -3,37 +3,6 @@
 payload:
   - DOMAIN-SUFFIX,arena.ai
 
-  # > Claude
-  - DOMAIN-SUFFIX,anthropic.com
-  - DOMAIN-SUFFIX,claude.ai
-  - DOMAIN-SUFFIX,claude.com
-  - DOMAIN-SUFFIX,clau.de
-  - DOMAIN-SUFFIX,claudemcpclient.com
-  - DOMAIN-SUFFIX,claudemcpcontent.com
-  - DOMAIN-SUFFIX,claudeusercontent.com
-  - DOMAIN,anthropic.auth0.com
-  - DOMAIN,anthropic.com.cdn.cloudflare.net
-  - DOMAIN,anthropic-com.ghost.io
-  - DOMAIN,servd-anthropic-website.b-cdn.net
-
-  # > Cursor
-  - DOMAIN-SUFFIX,cursor.com
-  - DOMAIN-SUFFIX,cursor-cdn.com
-
-  # > Grok
-  - DOMAIN-SUFFIX,grok.com
-  - DOMAIN-SUFFIX,grokipedia.com
-  - DOMAIN-SUFFIX,grokusercontent.com
-  - DOMAIN-SUFFIX,x.ai
-
-  # > Hermes
-  - DOMAIN-SUFFIX,nousresearch.com
-
-  # > Muse
-  - DOMAIN-SUFFIX,meta.ai
-  - DOMAIN-SUFFIX,metaaivm.com
-  - DOMAIN-SUFFIX,muse.ai
-
   # > ChatGPT
   - DOMAIN-SUFFIX,chat.com
   - DOMAIN-SUFFIX,chatgpt.com
@@ -49,20 +18,46 @@ payload:
   - DOMAIN-KEYWORD,openaiapi
   - DOMAIN-KEYWORD,openaicom
 
+  # > Claude
+  - DOMAIN-SUFFIX,anthropic.com
+  - DOMAIN-SUFFIX,claude.ai
+  - DOMAIN-SUFFIX,claude.com
+  - DOMAIN-SUFFIX,clau.de
+  - DOMAIN-SUFFIX,claudemcpclient.com
+  - DOMAIN-SUFFIX,claudemcpcontent.com
+  - DOMAIN-SUFFIX,claudeusercontent.com
+  - DOMAIN,anthropic.auth0.com
+  - DOMAIN,anthropic.com.cdn.cloudflare.net
+  - DOMAIN,anthropic-com.ghost.io
+  - DOMAIN,servd-anthropic-website.b-cdn.net
+
+  # > Cursor
+  - DOMAIN,accounts.spacex.ai
+  - DOMAIN,anysphere-binaries.s3.us-east-1.amazonaws.com
+  - DOMAIN-SUFFIX,cursor-cdn.com
+  - DOMAIN-SUFFIX,cursor.com
+  - DOMAIN-SUFFIX,cursor.sh
+  - DOMAIN-SUFFIX,cursorapi.com
+  - DOMAIN-SUFFIX,cursorvm.com
+
+  # > Grok
+  - DOMAIN-SUFFIX,grok.com
+  - DOMAIN-SUFFIX,grokipedia.com
+  - DOMAIN-SUFFIX,grokusercontent.com
+  - DOMAIN-SUFFIX,x.ai
+
+  # > Hermes
+  - DOMAIN-SUFFIX,nousresearch.com
+
+  # > Muse
+  - DOMAIN-SUFFIX,meta.ai
+  - DOMAIN-SUFFIX,metaaivm.com
+  - DOMAIN-SUFFIX,muse.ai
+
+  # > OpenRouter
+  - DOMAIN-SUFFIX,openrouter.ai
+
   # > Perplexity
   - DOMAIN,pplx-res.cloudinary.com
   - DOMAIN-SUFFIX,pplx.ai
   - DOMAIN-KEYWORD,perplexity
-
-  # > X（Twitter）
-  - DOMAIN-SUFFIX,pscp.tv
-  - DOMAIN-SUFFIX,t.co
-  - DOMAIN-SUFFIX,twimg.com
-  - DOMAIN-SUFFIX,twitter.com
-  - DOMAIN-SUFFIX,x.com
-  - IP-CIDR,192.133.76.0/22
-  - IP-CIDR,199.59.148.0/22
-  - IP-CIDR,199.96.56.0/21
-  - IP-CIDR,202.160.128.0/22
-  - IP-CIDR,209.237.192.0/19
-  - IP-CIDR,69.195.160.0/19
