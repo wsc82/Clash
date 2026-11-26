@@ -1,6 +1,8 @@
 # 来源：https://raw.githubusercontent.com/wsc82/Surge/main/Ruleset/Global.list
 # 由 Surge 规则自动转换生成，请勿手工修改。
 payload:
+  - DOMAIN-SUFFIX,rockstargames.com
+
   # ===== AI 服务 =====
 
   # > LM Arena
